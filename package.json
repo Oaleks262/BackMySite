@@ -1,34 +1,24 @@
 {
-  "name": "backmysite",
+  "name": "server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Oaleks262/BackMySite.git"
-  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Oaleks262/BackMySite/issues"
-  },
-  "homepage": "https://github.com/Oaleks262/BackMySite#readme",
   "description": "",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.15.0",
     "mongoose": "^8.13.2",
-    "nodemailer": "^6.10.0",
-    "pdfkit": "^0.16.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemailer": "^6.10.1",
+    "path": "^0.12.7",
+    "pdfkit": "^0.17.0"
   }
 }

@@ -1,38 +1,25 @@
 const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
-const createToken = (user) => {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-};
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
 
-exports.register = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: 'Email already registered' });
-
-    const user = new User({ email, password });
-    await user.save();
-    const token = createToken(user);
-    res.status(201).json({ token, role: user.role });
-  } catch (err) {
-    res.status(500).json({ message: 'Registration failed', error: err.message });
-  }
-};
-
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ error: 'Користувача не знайдено' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch) return res.status(401).json({ error: 'Невірний пароль' });
 
-    const token = createToken(user);
-    res.json({ token, role: user.role });
-  } catch (err) {
-    res.status(500).json({ message: 'Login failed', error: err.message });
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(200).json({ token, user: { email: user.email, role: user.role } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Помилка входу' });
   }
 };
+
+module.exports = { loginUser };
+

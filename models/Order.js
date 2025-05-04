@@ -1,9 +1,11 @@
-const { Schema, model: modelOrder } = require('mongoose');
+const mongoose = require('mongoose');
 
-const orderSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  message: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
+const orderSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  status: { type: String, default: 'draft' },
+  selectedTemplate: String,
+  confirmed: { type: Boolean, default: false },
+  pdfUrl: String
+}, { timestamps: true });
 
-module.exports = modelOrder('Order', orderSchema);
+module.exports = mongoose.model('Order', orderSchema);
