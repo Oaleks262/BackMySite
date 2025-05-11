@@ -3,10 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>Growth-tech</title>
 </head>
-<body>
-  <h1>Ласкаво просимо на Growth Tech</h1>
-  <p>Сервер Express запущено й готовий до роботи!</p>
+<body class="card">
+<header class="header">
+  <div class="conteiner">
+    <div class="header__content">
+      <nav class="header__content__nav">
+        <ul class="header__content__ul">
+          <li class="header__content__li"><a href="#cont">Про нас</a></li>
+          <li class="header__content__li"><a href="#price">Ціна</a></li>
+          <li class="header__content__li"><a href="#testing">Відгуки</a></li>
+        </ul>
+      </nav>
+      <a href="/" class="header__content__logo">
+        <img src="../img/Logo.png" alt="logo">
+        <div class="header__content__logo__text">
+            <p>Growth</p>
+            <p>Tech</p>
+        </div>
+      </a>
+      <nav class="header__content__nav">
+        <ul class="header__content__ul" style="justify-content: flex-end;">
+      
+          <li class="header__content__li"><a href="#">
+            Вхід
+          </a></li>
+          <li class="header__content__li">  
+            <button id="themeToggle" aria-label="Перемкнути тему">
+            <span id="icon">🌙</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+<section class="hero" id="hero">
+  <div class="conteiner">
+    <div class="hero__content">
+      <div class="hero__content__text">
+        <h1>Сайт, що росте разом з бізнесом</h1>
+        <p>Створюємо швидкі, сучасні та адаптивні рішення для твого зростання в інтернеті. Ми розробляємо сайти, які не просто добре виглядають, а й працюють на результат — від першого кліку до заявки.
+Мінімалізм у дизайні, чистий код і фокус на користувача — усе, що потрібно, щоб твій бренд вирізнявся в мережі.</p>
+        <a href="#price">Замовити</a>
+      </div>
+      <div class="hero__content__img">
+        <img src="../img/hero.PNG" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+<section class="stats" id="stats">
+  <div class="conteiner">
+    <div class="stats__content">
+      <h2>Цифри, які демонструють наш успіх</h2>
+      <div class="stats__content__text">
+        <ul class="stats__content__text__ul">
+          <li class="stats__content__text__li">
+            <h3>до 20 днів</h3>
+            <p>Середній термін виконання проєкту</p>
+          </li>
+          <li class="stats__content__text__li">
+            <h3>97% клієнтів</h3>
+            <p>Залишаються задоволеними результатом</p>
+          </li>
+          <li class="stats__content__text__li">
+            <h3>30+ партнерів</h3>
+            <p>Співпрацюють з нами на постійній основі</p>
+          </li>
+          <li class="stats__content__text__li">
+            <h3>100% підхід</h3>
+            <p>Кожен сайт — унікальний, як і твій бізнес</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="cont" id="cont">
+<div class="conteiner">
+  <div class="cont__content">
+    <div class="cont__content__title">
+      <h2>Хто ми такі</h2>
+      <p>Growth Tech — команда ентузіастів, яка створює сучасні вебсайти, що приносять результат. Ми поєднуємо дизайн, технології та стратегію, щоб допомогти вашому бізнесу зростати онлайн.</p>
+    </div>
+    <div class="cont__content__project">
+      <ul class="cont__content__project__ul">
+        <li class="cont__content__project__li">
+          <img src="../img/contentUXUI.PNG" alt="UXUI">
+          <h3>Веб-дизайн</h3>
+          <p>Ми створюємо сучасний, адаптивний дизайн, який підкреслює суть вашого бізнесу та викликає довіру з першого погляду.</p>
+        </li>
+        <li class="cont__content__project__li">
+          <h3>Написання коду</h3>
+          <p>Перетворюємо дизайн у функціональний сайт — чистий, швидкий і безпечний. Використовуємо сучасні технології для найкращого результату.</p>
+          <img src="../img/contentDev.PNG" alt="Dev">
+        </li>
+        <li class="cont__content__project__li">
+          <img src="../img/contentDeploi.PNG" alt="Instal">
+          <h3>Деплой</h3>
+          <p>Розміщуємо ваш сайт на хостингу, налаштовуємо домен, забезпечуємо роботу 24/7 та оптимізуємо для пошукових систем.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+<section class="price" id="price">
+<div class="conteiner">
+<div class="price__content">
+    <div class="price__content__title">
+      <h2>Вигідні тарифні плани</h2>
+      <p> Ми підготували чіткі пакети без прихованих платежів. Обери формат, який найкраще відповідає твоїм цілям.</p>
+    </div>
+    <ul class="price__content__ul">
+      <li class="price__content__li">
+        <div class="price__content__li__title">
+            <p style="text-transform: uppercase;"><b>Односторінковий сайт</b></p>
+            <h3>від $350</h3>
+            <p> Розробка до 16 днів</p>
+        </div>
+        <div class="price__content__li__about">
+          <p>&#10004 Індивідуальний дизайн</p>
+          <p>&#10004 Адаптивна верстка</p>
+          <p>&#10004 Оптимізація швидкості</p>
+          <p>&#10004 Підключення контактної форми</p>
+        </div>
+        <button class="price__content__li__btn">Замовити</button>
+      </li>
+      <li class="price__content__li">
+        <div class="price__content__li__title">
+            <p style="text-transform: uppercase;"><b>Лендінг (2–4 сторінки)</b></p>
+            <h3>від $450</h3>
+            <p>Розробка до 24 днів</p>
+        </div>
+        <div class="price__content__li__about">
+          <p>&#10004 Дизайн кожної сторінки</p>
+          <p>&#10004 Адаптивна верстка</p>
+          <p>&#10004 Проста серверна частина</p>
+          <p>&#10004 Адмін-панель для редагування 2–4 блоків</p>
+        </div>
+        <button class="price__content__li__btn">Замовити</button>
+      </li>
+      <li class="price__content__li">
+        <div class="price__content__li__title">
+            <p style="text-transform: uppercase;"><b>Блоговий сайт</b></p>
+            <h3>від $950</h3>
+            <p>Розробка до 45 днів</p>
+        </div>
+        <div class="price__content__li__about">
+          <p>&#10004 Головна сторінка</p>
+          <p>&#10004 Сторінки з постами (категорії, теги)</p>
+          <p>&#10004 Адмін-панель для керування статтями</p>
+          <p>&#10004 Форма зворотного зв'язку</p>
+          <p>&#10004 Базова аналітика</p>
+        </div>
+        <button class="price__content__li__btn">Замовити</button>
+      </li>
+    </ul>
+</div>
+</div>
+</section>
+<section class="accordion" id="accordion">
+<div class="conteiner">
+    <div class="accordion__content">
+      <div class="accordion__content__title">
+        <h2>Поширені запитання</h2>
+        <p> Тут ми зібрали відповіді на найпоширеніші запитання, які виникають у наших клієнтів. Якщо не знайдеш потрібного — просто напиши нам.</p>
+      </div>
+      <ul class="accordion__content__faq">
+        <li class="accordion__content__li">
+          
+        </li>
+        <li class="accordion__content__li">
+          
+        </li>
+        <li>
+          
+        </li>
+        <li>
+          
+        </li>
+      </ul>
+      
+    </div>
+</div>
+</div>
+</section>
+<section class="testing" id="testing">
+<div class="conteiner"></div>
+</section>
+<section  class="calltoaction" id="calltoaction">
+<div class="conteiner"></div>
+</section>
+<div class="conteiner"></div>
+<footer class="footer">
+<div class="conteiner"></div>
+</footer>
+
+
+ 
+
+
+<script src="../script.js"></script>
+<script src="../lang.js"></script>
 </body>
 </html>

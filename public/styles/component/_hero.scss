@@ -1,0 +1,73 @@
+.hero{
+    display: flex;
+    width: 100%;
+    padding: 80px 0;
+    height: 100vh;
+
+    &__content{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        &__text{
+            display: flex;
+            width: 40%;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 0px;
+            gap: 24px;
+
+            & > h1{
+                
+                font-family: Inter;
+                font-size: 52px;
+                font-weight: 800;
+                line-height: 48px;
+                letter-spacing: 0%;
+                text-align: left;
+            }
+            & > p{
+                
+                font-family: Inter;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+                letter-spacing: 0%;
+                text-align: left;
+            }
+            & > a{
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                padding: 14px 18px 14px 18px;
+                font-family: Inter;
+                font-size: 18px;
+                font-weight: 600;
+                line-height: 22px;
+                letter-spacing: 0%;
+                border-radius: 6px;
+                box-shadow: 0px 1px 4px 0px var(--color-muted);
+                background: var(--color-background);
+                transition: background 1s ease-in-out, color 1s ease-in-out;
+                &:hover{
+                    background: var(--color-hover);
+                    color: var(--color-hover-text);
+                }
+            }
+        }
+        &__img{
+           display: flex;
+           width: 40%; 
+           max-width: 650px;
+           justify-content: center;
+           align-items: center;
+           border-radius: 25px;
+           & > img{
+            width: 90%;
+
+           }
+        }
+    }
+}

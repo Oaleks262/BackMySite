@@ -1,0 +1,78 @@
+.cont{
+    display: flex;
+    width: 100%;
+    padding: 80px 0;
+    &__content{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 56px;
+
+        &__title{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+
+            & > h2{
+                font-family: Inter;
+                font-size: 30px;
+                font-weight: 800;
+                line-height: 36px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+            & > p{
+                width: 75%;
+                font-family: Inter;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+        }
+
+        &__project{
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+
+            &__ul{
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-between;
+            }
+            &__li{
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+                justify-content: center;
+                & > img{
+                    width: 300px;
+                }
+                & > h3{
+                    font-family: Inter;
+                    font-size: 18px;
+                    font-weight: 800;
+                    line-height: 28px;
+                    letter-spacing: 0%;
+                    text-align: left;
+                }
+                & > p{
+                    width: 336px;
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-weight: 400;
+                    line-height: 24px;
+                    letter-spacing: 0%;
+                    text-align: left;
+                }
+            }
+        }
+    }
+}
