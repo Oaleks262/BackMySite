@@ -1,3 +1,13 @@
+@media screen and (max-width: 1279px) {
+  .header{
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 1280px) {
+
+
 // Основні теми для header
 .lang-toggle {
   display: flex;
@@ -29,6 +39,8 @@
   color: var(--color-muted, #8a9eb5);
 }
 
+
+  
 
 // Основна тема
     .header{
@@ -91,9 +103,10 @@
               transition: border 1s ease-in-out , box-shadow 1s ease-in-out;
               
               &:hover{
-                border: 1px solid var(--color-muted);
+                
                 box-shadow: 0px 1px 4px 0px var(--color-muted);
               }
             }
         }
     }
+}

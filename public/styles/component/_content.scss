@@ -43,6 +43,133 @@
 
             &__ul{
                 display: flex;
+                flex-direction: column;
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+                gap: 24px;
+            }
+            &__li{
+                display: flex;
+                width: 100%;
+                flex-direction: column;
+                gap: 24px;
+                justify-content: center;
+                align-items: center;
+                & > img{
+                    width: 60%;
+                }
+                &__div{
+                    display: flex;
+                    width: 100%;
+                    flex-direction: column;
+                    justify-content: center;
+                
+                & > h3{
+                    width: 100%;
+                    font-family: Inter;
+                    font-size: 20px;
+                    font-weight: 800;
+                    line-height: 28px;
+                    letter-spacing: 0%;
+                    text-align: center;
+                }
+                & > p{
+                    width: 100%;
+                    font-family: Inter;
+                    font-size: 16px;
+                    font-weight: 400;
+                    line-height: 24px;
+                    letter-spacing: 0%;
+                    text-align: center;
+                }
+            }
+            }
+            &__li-rev{
+                display: flex;
+                flex-direction: column-reverse;
+                gap: 24px;
+                justify-content: center;
+                align-items: center;
+                & > img{
+                    width: 60%;
+                }
+                 &__div{
+                    display: flex;
+                    width: 100%;
+                    flex-direction: column;
+                    justify-content: center;
+                
+                & > h3{
+                    width: 100%;
+                    font-family: Inter;
+                    font-size: 20px;
+                    font-weight: 800;
+                    line-height: 28px;
+                    letter-spacing: 0%;
+                    text-align: center;
+                }
+                & > p{
+                    width: 100%;
+                    font-family: Inter;
+                    font-size: 16px;
+                    font-weight: 400;
+                    line-height: 24px;
+                    letter-spacing: 0%;
+                    text-align: center;
+                }
+            }
+            }
+        }
+    }
+}
+
+@media screen and (min-width:1280px) {
+    .cont{
+    display: flex;
+    width: 100%;
+    padding: 80px 0;
+    &__content{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 56px;
+
+        &__title{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+
+            & > h2{
+                font-family: Inter;
+                font-size: 30px;
+                font-weight: 800;
+                line-height: 36px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+            & > p{
+                width: 75%;
+                font-family: Inter;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+        }
+
+        &__project{
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+
+            &__ul{
+                display: flex;
                 flex-direction: row;
                 width: 100%;
                 justify-content: space-between;
@@ -73,6 +200,10 @@
                     text-align: left;
                 }
             }
+            &__li-rev{
+                flex-direction: column;
+            }
         }
     }
+}
 }

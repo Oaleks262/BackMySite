@@ -6,6 +6,82 @@
 
     &__content{
         display: flex;
+        flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+        gap: 32px;
+        &__text{
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0px;
+            gap: 24px;
+
+            & > h1{
+                width: 100%;
+                font-family: Inter;
+                font-size: 48px;
+                font-weight: 800;
+                line-height: 48px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+            & > p{
+                width: 100%;
+                font-family: Inter;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+            & > a{
+                display: flex;
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                padding: 14px 18px 14px 18px;
+                font-family: Inter;
+                font-size: 18px;
+                font-weight: 600;
+                line-height: 22px;
+                letter-spacing: 0%;
+                border-radius: 6px;
+                box-shadow: 0px 1px 4px 0px var(--color-muted);
+                background: var(--color-background);
+                transition: background 1s ease-in-out, color 1s ease-in-out;
+                &:hover{
+                    background: var(--color-hover);
+                    color: var(--color-hover-text);
+                }
+            }
+        }
+        &__img{
+           display: flex;
+           width: 100%; 
+           max-width: 650px;
+           justify-content: center;
+           align-items: center;
+           border-radius: 25px;
+           & > img{
+            width: 90%;
+
+           }
+        }
+    }
+}
+@media screen and (min-width:1280px){
+    .hero{
+    display: flex;
+    width: 100%;
+    padding: 80px 0;
+    height: 100vh;
+
+    &__content{
+        display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
@@ -70,4 +146,5 @@
            }
         }
     }
+}
 }

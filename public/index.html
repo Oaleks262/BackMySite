@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <title>Growth-tech</title>
 </head>
 <body class="card">
@@ -31,7 +32,7 @@
           <li class="header__content__li"><a href="#">
             Вхід
           </a></li>
-          <li class="header__content__li">  
+          <li style=" box-shadow: 0px 1px 4px 0px var(--color-muted);" class="header__content__li">  
             <button id="themeToggle" aria-label="Перемкнути тему">
             <span id="icon">🌙</span>
             </button>
@@ -41,6 +42,47 @@
     </div>
   </div>
 </header>
+ <div class="header__mob">
+    <div class="conteiner">
+      <div class="header__mob__content">
+        <a href="/" class="header__mob__content__logo">
+          <img src="../img/Logo.png" alt="logo" width="40" />
+          <div class="header__mob__content__logo__text">
+            <p>Growth</p>
+            <p>Tech</p>
+          </div>
+        </a>
+        <button id="openMenu" aria-label="Відкрити меню">
+          <svg><use href="../icon/symbol-defs.svg#icon-menu"/></svg>
+        </button>
+      </div>
+
+      <div class="header__mob__menu" id="mobileMenu">
+        <div class="header__mob__menu__box">
+          <button id="closeMenu" aria-label="Закрити меню">
+            <svg><use href="../icon/symbol-defs.svg#icon-cross"/></svg>
+          </button>
+        </div>
+
+        <ul class="header__mob__menu__list">
+          <li class="header__mob__menu__list__li"><a href="#cont">Про нас</a></li>
+          <li class="header__mob__menu__list__li"><a href="#price">Ціна</a></li>
+          <li class="header__mob__menu__list__li"><a href="#testing">Відгуки</a></li>
+          <li class="header__mob__menu__list__li"><a href="#">Вхід</a></li>
+          <li class="header__mob__menu__list__li" style="margin-top: 44px;">
+            <button style=" box-shadow: 0px 1px 4px 0px var(--color-muted);" id="themeToggleMob"><span id="icon">🌙</span></button>
+          </li>
+          <li class="header__mob__menu__list__li">
+            <ul class="header__mob__link__list2">
+              <li class="header__mob__link__list2__li"><a href="tel:+380675252300"><svg><use href="../icon/symbol-defs.svg#icon-phone"/></svg></a></li>
+              <li class="header__mob__link__list2__li"><a href="mailto:growthtech.contact@gmail.com" target="_blank"><svg><use href="../icon/symbol-defs.svg#icon-mail"/></svg></a></li>
+              <li class="header__mob__link__list2__li"><a href="https://www.instagram.com/growth_tech.com.ua/" target="_blank"><svg><use href="../icon/symbol-defs.svg#icon-instagram"/></svg></a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 <section class="hero" id="hero">
   <div class="conteiner">
     <div class="hero__content">
@@ -92,20 +134,26 @@
     </div>
     <div class="cont__content__project">
       <ul class="cont__content__project__ul">
-        <li class="cont__content__project__li">
+        <li class="cont__content__project__li-rev">
           <img src="../img/contentUXUI.PNG" alt="UXUI">
-          <h3>Веб-дизайн</h3>
-          <p>Ми створюємо сучасний, адаптивний дизайн, який підкреслює суть вашого бізнесу та викликає довіру з першого погляду.</p>
+          <div class="cont__content__project__li-rev__div">
+            <h3>Веб-дизайн</h3>
+            <p>Ми створюємо сучасний, адаптивний дизайн, який підкреслює суть вашого бізнесу та викликає довіру з першого погляду.</p>
+          </div>
         </li>
         <li class="cont__content__project__li">
-          <h3>Написання коду</h3>
-          <p>Перетворюємо дизайн у функціональний сайт — чистий, швидкий і безпечний. Використовуємо сучасні технології для найкращого результату.</p>
+          <div class="cont__content__project__li__div">
+            <h3>Написання коду</h3>
+            <p>Перетворюємо дизайн у функціональний сайт — чистий, швидкий і безпечний. Використовуємо сучасні технології для найкращого результату.</p>
+          </div>
           <img src="../img/contentDev.PNG" alt="Dev">
         </li>
-        <li class="cont__content__project__li">
+        <li class="cont__content__project__li-rev">
           <img src="../img/contentDeploi.PNG" alt="Instal">
-          <h3>Деплой</h3>
-          <p>Розміщуємо ваш сайт на хостингу, налаштовуємо домен, забезпечуємо роботу 24/7 та оптимізуємо для пошукових систем.</p>
+          <div class="cont__content__project__li-rev__div">
+            <h3>Деплой</h3>
+            <p>Розміщуємо ваш сайт на хостингу, налаштовуємо домен, забезпечуємо роботу 24/7 та оптимізуємо для пошукових систем.</p>
+          </div>
         </li>
       </ul>
     </div>
@@ -172,43 +220,140 @@
     <div class="accordion__content">
       <div class="accordion__content__title">
         <h2>Поширені запитання</h2>
-        <p> Тут ми зібрали відповіді на найпоширеніші запитання, які виникають у наших клієнтів. Якщо не знайдеш потрібного — просто напиши нам.</p>
+        <p> Тут ми зібрали відповіді на найпоширеніші запитання, які виникають у наших клієнтів. <br> Якщо не знайдеш потрібного — просто напиши нам.</p>
       </div>
       <ul class="accordion__content__faq">
         <li class="accordion__content__li">
-          
+          <div class="accordion__content__li__title">
+            <p><b>Скільки часу займає створення сайту?</b></p>
+            <span class="accordion-icon">+</span>
+          </div>
+          <p class="accordion-answer">
+              Залежить від типу сайту. Односторінковий — до 16 днів, лендінг — до 24, блог — до 45 днів.
+          </p>
         </li>
         <li class="accordion__content__li">
-          
+          <div class="accordion__content__li__title">
+            <p><b>Чи можна редагувати сайт самостійно після розробки?</b></p>
+            <span class="accordion-icon">+</span>
+          </div>
+          <p class="accordion-answer">
+            Так. У всіх пакетах (крім односторінкового) передбачена адмін-панель для самостійного редагування контенту.</p>
         </li>
-        <li>
-          
+        <li class="accordion__content__li">
+          <div class="accordion__content__li__title">
+            <p><b>Чи входить у вартість домен і хостинг?</b></p>
+            <span class="accordion-icon">+</span>
+          </div>
+          <p class="accordion-answer">
+            Ні, але ми допоможемо обрати, зареєструвати й налаштувати домен та хостинг.</p>
         </li>
-        <li>
-          
+        <li class="accordion__content__li">
+          <div class="accordion__content__li__title">
+            <p><b>Як відбувається оплата?</b></p>
+            <span class="accordion-icon">+</span>
+          </div>
+          <p class="accordion-answer">
+            Ми працюємо з передоплатою 30%. Повна оплата — після затвердження готового сайту. Оплата через банківський переказ або Monobank</p>
         </li>
       </ul>
-      
     </div>
 </div>
 </div>
 </section>
-<section class="testing" id="testing">
-<div class="conteiner"></div>
+<section class="testimonial" id="testing">
+  <div class="conteiner">
+    <div class="testimonial__contemt">
+      <div class="testimonial__slider">
+        <button class="testimonial_btn button-prev">
+          <svg>
+            <use href="../icon/symbol-defs.svg#icon-arrow" alt="icon" />
+          </svg>
+        </button>
+
+        <div class="swiper-container">
+          <ul class="testimonial__list swiper-wrapper">
+            <li class="testimonial__item swiper-slide">
+              <h3>Марія К.</h3>
+              <p>“Дуже задоволена співпрацею...”</p>
+              <strong>власниця кав’ярні</strong>
+            </li>
+            <li class="testimonial__item swiper-slide">
+              <h3>Іван Б</h3>
+              <p>“Сайт — як візитка мого стилю...”</p>
+              <strong>Дизайнер інтер'єрів</strong>
+            </li>
+            <li class="testimonial__item swiper-slide">
+              <h3>Олена С.</h3>
+              <p>“Вже маємо нових клієнтів!”</p>
+              <strong>Фотограф</strong>
+            </li>
+            <li class="testimonial__item swiper-slide">
+              <h3>Андрій М.</h3>
+              <p>“Рекомендую всім знайомим!”</p>
+              <strong>Підприємець</strong>
+            </li>
+          </ul>
+
+          <div class="pagination">
+            <button class="pagination__button" type="button" aria-label="Go to slide 1"></button>
+            <button class="pagination__button" type="button" aria-label="Go to slide 2"></button>
+            <button class="pagination__button" type="button" aria-label="Go to slide 3"></button>
+            <button class="pagination__button" type="button" aria-label="Go to slide 4"></button>
+          </div>
+        </div>
+
+        <button class="testimonial_btn next button-next">
+          <svg>
+            <use href="../icon/symbol-defs.svg#icon-arrow" alt="icon" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 </section>
+
 <section  class="calltoaction" id="calltoaction">
-<div class="conteiner"></div>
+<div class="conteiner">
+  <div class="calltoaction__content">
+    <div class="calltoaction__content__img">
+      <img src="../img/call.PNG" alt="img"/>
+    </div>
+    <div class="calltoaction__content__text">
+      <h2>Не знайшли відповіді?</h2>
+      <p> Напишіть нам — з радістю допоможемо розібратись і підберемо найкраще рішення саме для вас.</p>
+      <a href="mailto:growthtech.contact@gmail.com">Написати нам</a>
+    </div>
+    
+  </div>
+</div>
 </section>
-<div class="conteiner"></div>
 <footer class="footer">
-<div class="conteiner"></div>
+<div class="conteiner">
+  <div class="footer__content">
+    <a href="/"><img src="../img/Logo.png" alt="logo" class="footer__content__logo" /></a>
+    <div class="footer__content__text">
+     <p> 2025 Growth-Tech Agency |  Всі права захищені ©</p>
+      <div class="footer__content__text__document">
+        <p><a href="../document/policy.pdf" target="_blank">Політика конфіденційності</a></p>
+        <p><a href="../document/rules.pdf" target="_blank">Правила користування сайтом</a></p>
+      </div>
+    </div>
+    <ul class="footer__content__list">
+      <li class="footer__content__list__li"><a href="phone:+380675252300"><svg><use href="../icon/symbol-defs.svg#icon-phone"/></svg></a></li>
+      <li class="footer__content__list__li"><a href="mailto:growthtech.contact@gmail.com" target="_blank"><svg><use href="../icon/symbol-defs.svg#icon-mail"/></svg></a></li>
+      <li class="footer__content__list__li"><a href="https://www.instagram.com/growth_tech.com.ua/" target="_blank"><svg><use href="../icon/symbol-defs.svg#icon-instagram"/></svg></a></li>
+    </ul>
+  </div>
+</div>
 </footer>
 
 
  
 
-
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="../script.js"></script>
 <script src="../lang.js"></script>
+<script src="../swiper.js"></script>
 </body>
 </html>

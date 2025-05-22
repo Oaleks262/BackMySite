@@ -1,0 +1,176 @@
+.accordion{
+    display: flex;
+    width: 100%;
+    padding: 80px 0;
+    &__content{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 32px;
+        justify-content: center;
+        align-items: center;
+
+        &__title{
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            justify-content: center;
+            align-items: center;
+
+            & > h2{
+                font-family: Inter;
+                font-size: 36px;
+                font-weight: 800;
+                line-height: 40px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+
+            & > p{
+                font-family: Inter;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+        }
+        &__faq{
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+        }
+        &__li{
+            display: flex;
+            flex-direction: column;
+            width: 70%;
+            gap: 10px;
+            padding: 20px 24px;
+            border-radius: 20px;
+            border-top: 1px solid var(--color-muted);
+            background: var(--color-background);
+            cursor: pointer;
+            transition: background 1s ease-in-out;
+
+            &__title{
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                .accordion-icon {
+                    transition: transform 0.3s ease;
+                    font-size: 24px;
+                    font-weight: bold;
+            }
+        }
+        &.active {
+            background: var(--color-muted); // або будь-який інший приємний колір
+        }
+        &.active .accordion-icon {
+            transform: rotate(45deg); // + → ×
+        }
+        .accordion-answer {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 1s ease-in-out, opacity 1s ease-in-out;
+        }
+        &.active .accordion-answer {
+            max-height: 300px; 
+            opacity: 1;  
+        }
+        }
+    }
+}
+
+@media screen and (min-width:1280px){
+    .accordion{
+    display: flex;
+    width: 100%;
+    padding: 80px 0;
+    &__content{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 32px;
+        justify-content: center;
+        align-items: center;
+
+        &__title{
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            justify-content: center;
+            align-items: center;
+
+            & > h2{
+                font-family: Inter;
+                font-size: 36px;
+                font-weight: 800;
+                line-height: 40px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+
+            & > p{
+                font-family: Inter;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+        }
+        &__faq{
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+        }
+        &__li{
+            display: flex;
+            flex-direction: column;
+            width: 70%;
+            gap: 10px;
+            padding: 20px 24px;
+            border-radius: 20px;
+            border-top: 1px solid var(--color-muted);
+            background: var(--color-background);
+            cursor: pointer;
+            transition: background 1s ease-in-out;
+
+            &__title{
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                .accordion-icon {
+                    transition: transform 0.3s ease;
+                    font-size: 24px;
+                    font-weight: bold;
+            }
+        }
+        &.active {
+            background: var(--color-muted); // або будь-який інший приємний колір
+        }
+        &.active .accordion-icon {
+            transform: rotate(45deg); // + → ×
+        }
+        .accordion-answer {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 1s ease-in-out, opacity 1s ease-in-out;
+        }
+        &.active .accordion-answer {
+            max-height: 300px; 
+            opacity: 1;  
+        }
+        }
+    }
+}
+
+}

@@ -1,0 +1,58 @@
+.footer{
+    width: 100%;
+    display: flex;
+    padding: 24px 0;
+
+    &__content{
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        &__logo {
+            width: 100px;
+            height: 100px;
+        }
+        &__text {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+
+            &__document{
+                display: flex;
+                flex-direction: row;
+                gap: 12px;
+
+                & > p > a{
+                    text-decoration: underline;
+                    font-family: Inter;
+                    font-size: 16px;
+                    font-weight: 400;
+                    line-height: 22px;
+                    letter-spacing: 0%;
+                }
+            }
+        }
+        &__list {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+
+            &__li{
+                display: flex;
+                width: 50px;
+
+                & > a > svg{
+                    width: 50px;
+                    fill: var(--color-text);
+                    transition: border 1s ease-in-out;
+                }
+            }
+        }
+    }
+}

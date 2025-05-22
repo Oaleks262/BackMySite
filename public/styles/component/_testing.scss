@@ -1,0 +1,143 @@
+.testimonial {
+  width: 100%;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f9fafc;
+
+  &__content {
+    max-width: 1440px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 40px;
+
+    h2 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1d1d1f;
+    }
+
+    p {
+      font-size: 16px;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  &__slider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 1440px;
+  }
+
+  &__btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: #333;
+    }
+
+    &:hover {
+      background: #eaeaea;
+    }
+
+    &.next {
+      transform: rotate(180deg);
+    }
+  }
+
+  .swiper-container {
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .swiper-wrapper {
+    display: flex;
+  }
+
+  .swiper-slide {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 550px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    box-sizing: border-box;
+
+    .avatar {
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      color: #222;
+    }
+
+    span {
+      display: block;
+      font-size: 14px;
+      color: #888;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+
+    &__button {
+      width: 10px;
+      height: 10px;
+      margin: 0 4px;
+      border-radius: 50%;
+      border: none;
+      background: #;
+      cursor: pointer;
+
+      &__active {
+        background: #333;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1279px) {
+  .swiper-slide {
+    max-width: 90%;
+  }
+
+  .testimonial__btn {
+    display: none;
+  }
+}
