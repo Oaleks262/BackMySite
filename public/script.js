@@ -76,66 +76,6 @@ document.querySelectorAll('.accordion__content__li').forEach((item) => {
 });
 
 
-const wrapper = document.querySelector('.testimonial__wrapper');
-const prevBtn = document.querySelector('.slider-btn.prev');
-const nextBtn = document.querySelector('.slider-btn.next');
-const cards = document.querySelectorAll('.testimonial__card');
-
-let currentIndex = 0;
-let cardsToShow = 2;
-let cardWidth = 0;
-
-function updateCardSettings() {
-  const windowWidth = window.innerWidth;
-
-  // Визначаємо скільки карт показувати
-  if (windowWidth < 1280) {
-    cardsToShow = 1;
-  } else {
-    cardsToShow = 2;
-  }
-
-  // Динамічно визначаємо ширину першої картки (враховуючи margin)
-  if (cards.length > 0) {
-    const cardStyle = getComputedStyle(cards[0]);
-    const width = cards[0].offsetWidth;
-    const marginRight = parseInt(cardStyle.marginRight) || 0;
-    const marginLeft = parseInt(cardStyle.marginLeft) || 0;
-    cardWidth = width + marginRight + marginLeft;
-  }
-}
-
-function updateSlider() {
-  const offset = currentIndex * cardWidth;
-  wrapper.scrollTo({
-    left: offset,
-    behavior: 'smooth'
-  });
-}
-
-nextBtn.addEventListener('click', () => {
-  if (currentIndex < cards.length - cardsToShow) {
-    currentIndex++;
-    updateSlider();
-  }
-});
-
-prevBtn.addEventListener('click', () => {
-  if (currentIndex > 0) {
-    currentIndex--;
-    updateSlider();
-  }
-});
-
-window.addEventListener('resize', () => {
-  updateCardSettings();
-  updateSlider(); // щоб не залипало після зміни ширини
-});
-
-// Початкова ініціалізація
-updateCardSettings();
-updateSlider();
-
 
 
  const openBtn = document.getElementById('openMenu');

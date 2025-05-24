@@ -5,6 +5,85 @@
 
     &__content{
         display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        gap: 24px;
+
+        &__img{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+
+            & > img{
+                width: 100%;
+            }
+        }
+        &__text{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 38px;
+
+            & > h2{
+                color: var( --color-text-revers);
+                font-family: Inter;
+                font-size: 30px;
+                font-weight: 800;
+                line-height: 36px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+
+            & > p {
+                color: var(--color-text-revers);
+                font-family: Inter;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+                letter-spacing: 0%;
+                text-align: center;
+            }
+
+            & > a {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                padding: 14px 18px 14px 18px;
+                width: 180px;
+                font-family: Inter;
+                font-size: 18px;
+                font-weight: 600;
+                line-height: 22px;
+                letter-spacing: 0%;
+                border-radius: 6px;
+                box-shadow: 0px 1px 4px 0px var(--color-muted);
+                background: var(--color-background);
+                transition: background 1s ease-in-out, color 1s ease-in-out;
+                &:hover{
+                    background: var(--color-hover);
+                    color: var(--color-hover-text);
+                }
+            }
+        }
+    }
+}
+
+
+@media screen and (min-width:1280px){
+    .calltoaction{
+    width: 100%;
+    background-color: var(--color-background-revers);
+    padding: 80px 0;
+
+    &__content{
+        display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
@@ -71,4 +150,5 @@
             }
         }
     }
+}
 }

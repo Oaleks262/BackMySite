@@ -46,7 +46,7 @@
         &__li{
             display: flex;
             flex-direction: column;
-            width: 70%;
+            width: 100%;
             gap: 10px;
             padding: 20px 24px;
             border-radius: 20px;
@@ -59,6 +59,7 @@
                 display: flex;
                 justify-content: space-between;
                 width: 100%;
+                gap: 24px;
                 .accordion-icon {
                     transition: transform 0.3s ease;
                     font-size: 24px;
