@@ -37,6 +37,9 @@
   }
 
   &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     cursor: pointer;
@@ -72,7 +75,7 @@
   .swiper-slide {
     flex-shrink: 0;
     width: 100%;
-    max-width: 550px;
+    max-width: 100%;
     background: #fff;
     border-radius: 12px;
     padding: 32px;

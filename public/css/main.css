@@ -416,6 +416,7 @@ li {
   }
   .hero__content__text > a {
     display: flex;
+    width: 50%;
     flex-direction: row;
     justify-content: center;
     align-items: center;
@@ -535,6 +536,7 @@ li {
     flex-direction: row;
     gap: 22px;
     justify-content: space-between;
+    align-items: normal;
   }
   .stats__content__text__li {
     display: flex;
@@ -1191,6 +1193,9 @@ li {
   max-width: 1440px;
 }
 .testimonial__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
@@ -1220,7 +1225,7 @@ li {
 .testimonial .swiper-slide {
   flex-shrink: 0;
   width: 100%;
-  max-width: 550px;
+  max-width: 100%;
   background: #fff;
   border-radius: 12px;
   padding: 32px;
