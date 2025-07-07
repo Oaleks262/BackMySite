@@ -541,3 +541,192 @@ document.addEventListener('keydown', function(event) {
     }
   }
 });
+
+// Enhanced Features - Payment Integration
+let stripe;
+let elements;
+let paymentElement;
+
+async function initializeStripe() {
+  if (typeof Stripe === 'undefined') {
+    console.warn('Stripe not loaded');
+    return;
+  }
+  
+  stripe = Stripe('pk_test_your_stripe_public_key_here'); // Replace with actual key
+  elements = stripe.elements();
+}
+
+async function createPaymentIntent(orderId) {
+  try {
+    const response = await fetch('/api/payment/create-payment-intent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ orderId })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Payment intent creation failed:', error);
+    throw error;
+  }
+}
+
+// File Upload Functions
+async function uploadFile(file) {
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch('/api/upload/image', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('File upload failed:', error);
+    throw error;
+  }
+}
+
+// Template Preview Functions
+async function loadTemplatePreview(templateId) {
+  try {
+    const response = await fetch(`/api/templates/${templateId}/preview`);
+    const html = await response.text();
+    
+    return html;
+  } catch (error) {
+    console.error('Template preview failed:', error);
+    throw error;
+  }
+}
+
+// Profile Management Functions
+async function updateProfile(profileData) {
+  try {
+    const response = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(profileData)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Profile update failed:', error);
+    throw error;
+  }
+}
+
+async function getUserOrders() {
+  try {
+    const response = await fetch('/api/profile/orders', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Orders fetch failed:', error);
+    throw error;
+  }
+}
+
+// Website Generation Functions
+async function generateWebsite(orderId) {
+  try {
+    const response = await fetch(`/api/website/generate/${orderId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Website generation failed:', error);
+    throw error;
+  }
+}
+
+// Initialize enhanced features when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initializeStripe();
+  
+  // Add file upload handlers
+  const fileInputs = document.querySelectorAll('input[type="file"]');
+  fileInputs.forEach(input => {
+    input.addEventListener('change', handleFileUpload);
+  });
+
+  // Add payment button handlers
+  const paymentButtons = document.querySelectorAll('.payment-btn');
+  paymentButtons.forEach(button => {
+    button.addEventListener('click', handlePaymentClick);
+  });
+});
+
+async function handleFileUpload(event) {
+  const files = event.target.files;
+  if (!files.length) return;
+
+  try {
+    showAlert('Завантаження файлів...', 'info');
+    
+    const result = await uploadFile(files[0]);
+    showAlert('Файл успішно завантажено!', 'success');
+    return result;
+  } catch (error) {
+    showAlert(`Помилка завантаження: ${error.message}`, 'error');
+  }
+}
+
+async function handlePaymentClick(event) {
+  const orderId = event.target.dataset.orderId;
+  if (!orderId) return;
+
+  try {
+    showAlert('Підготовка платежу...', 'info');
+    
+    const paymentData = await createPaymentIntent(orderId);
+    showAlert('Платіж успішно обробленo!', 'success');
+  } catch (error) {
+    showAlert(`Помилка платежу: ${error.message}`, 'error');
+  }
+}
