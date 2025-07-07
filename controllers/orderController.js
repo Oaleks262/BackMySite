@@ -43,15 +43,33 @@ const createOrder = async (req, res) => {
     console.log('New order created:', newOrder._id);
 
     try {
+      // Send email to customer
       await sendEmail(email, 'Ваші дані для входу', `
         <h2>Дякуємо за замовлення!</h2>
         <p><strong>Ваш логін:</strong> ${email}</p>
         <p><strong>Ваш пароль:</strong> ${rawPassword}</p>
         <p>Увійдіть у свій кабінет, щоб завершити оформлення сайту.</p>
       `);
-      console.log('Order created and email sent for:', email);
+      console.log('Customer email sent successfully for:', email);
     } catch (emailError) {
-      console.error('Email sending failed but order created:', emailError);
+      console.error('Customer email sending failed:', emailError);
+    }
+
+    try {
+      // Send notification to admin
+      await sendEmail(process.env.SMTP_EMAIL, 'Нове замовлення на сайті', `
+        <h2>Нове замовлення!</h2>
+        <p><strong>Клієнт:</strong> ${firstName} ${lastName}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Телефон:</strong> ${phone}</p>
+        <p><strong>ID замовлення:</strong> ${newOrder._id}</p>
+        <p><strong>Час створення:</strong> ${new Date().toLocaleString('uk-UA')}</p>
+        <hr>
+        <p>Увійдіть в адмін панель для перегляду деталей замовлення.</p>
+      `);
+      console.log('Admin notification sent successfully');
+    } catch (emailError) {
+      console.error('Admin notification sending failed:', emailError);
     }
 
     res.status(201).json({ 
@@ -90,6 +108,25 @@ const updateTemplate = async (req, res) => {
       order.status = 'draft';
       await order.save();
       console.log('Updated existing order:', order._id);
+    }
+
+    // Send notification to admin about template update
+    try {
+      const user = await User.findById(userId);
+      await sendEmail(process.env.SMTP_EMAIL, 'Замовлення оновлено - готове до обробки', `
+        <h2>Замовлення оновлено!</h2>
+        <p><strong>Клієнт:</strong> ${user.firstName} ${user.lastName}</p>
+        <p><strong>Email:</strong> ${user.email}</p>
+        <p><strong>Телефон:</strong> ${user.phone}</p>
+        <p><strong>ID замовлення:</strong> ${order._id}</p>
+        <p><strong>Обраний шаблон:</strong> ${template}</p>
+        <p><strong>Час оновлення:</strong> ${new Date().toLocaleString('uk-UA')}</p>
+        <hr>
+        <p>Замовлення готове до обробки. Увійдіть в адмін панель для підтвердження.</p>
+      `);
+      console.log('Admin template update notification sent');
+    } catch (emailError) {
+      console.error('Admin template update notification failed:', emailError);
     }
 
     res.status(200).json({ message: 'Шаблон оновлено', order });
