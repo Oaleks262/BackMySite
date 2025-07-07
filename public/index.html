@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <title>Growth-tech</title>
@@ -20,7 +20,7 @@
         </ul>
       </nav>
       <a href="/" class="header__content__logo">
-        <img src="../img/Logo.png" alt="logo">
+        <img src="img/Logo.png" alt="logo">
         <div class="header__content__logo__text">
             <p>Growth</p>
             <p>Tech</p>
@@ -29,7 +29,7 @@
       <nav class="header__content__nav">
         <ul class="header__content__ul" style="justify-content: flex-end;">
       
-          <li class="header__content__li"><a href="#">
+          <li class="header__content__li"><a href="#" onclick="openLoginModal()">
             Вхід
           </a></li>
           <li style=" box-shadow: 0px 1px 4px 0px var(--color-muted);" class="header__content__li">  
@@ -46,7 +46,7 @@
     <div class="conteiner">
       <div class="header__mob__content">
         <a href="/" class="header__mob__content__logo">
-          <img src="../img/Logo.png" alt="logo" width="40" />
+          <img src="img/Logo.png" alt="logo" width="40" />
           <div class="header__mob__content__logo__text">
             <p>Growth</p>
             <p>Tech</p>
@@ -68,7 +68,7 @@
           <li class="header__mob__menu__list__li"><a href="#cont">Про нас</a></li>
           <li class="header__mob__menu__list__li"><a href="#price">Ціна</a></li>
           <li class="header__mob__menu__list__li"><a href="#testing">Відгуки</a></li>
-          <li class="header__mob__menu__list__li"><a href="#">Вхід</a></li>
+          <li class="header__mob__menu__list__li"><a href="#" onclick="openLoginModal()">Вхід</a></li>
           <li class="header__mob__menu__list__li" style="margin-top: 44px;">
             <button style=" box-shadow: 0px 1px 4px 0px var(--color-muted);" id="themeToggleMob"><span id="icon">🌙</span></button>
           </li>
@@ -93,7 +93,7 @@
         <a href="#price">Замовити</a>
       </div>
       <div class="hero__content__img">
-        <img src="../img/hero.PNG" alt="">
+        <img src="img/hero.PNG" alt="">
       </div>
     </div>
   </div>
@@ -135,7 +135,7 @@
     <div class="cont__content__project">
       <ul class="cont__content__project__ul">
         <li class="cont__content__project__li-rev">
-          <img src="../img/contentUXUI.PNG" alt="UXUI">
+          <img src="img/contentUXUI.PNG" alt="UXUI">
           <div class="cont__content__project__li-rev__div">
             <h3>Веб-дизайн</h3>
             <p>Ми створюємо сучасний, адаптивний дизайн, який підкреслює суть вашого бізнесу та викликає довіру з першого погляду.</p>
@@ -146,10 +146,10 @@
             <h3>Написання коду</h3>
             <p>Перетворюємо дизайн у функціональний сайт — чистий, швидкий і безпечний. Використовуємо сучасні технології для найкращого результату.</p>
           </div>
-          <img src="../img/contentDev.PNG" alt="Dev">
+          <img src="img/contentDev.PNG" alt="Dev">
         </li>
         <li class="cont__content__project__li-rev">
-          <img src="../img/contentDeploi.PNG" alt="Instal">
+          <img src="img/contentDeploi.PNG" alt="Instal">
           <div class="cont__content__project__li-rev__div">
             <h3>Деплой</h3>
             <p>Розміщуємо ваш сайт на хостингу, налаштовуємо домен, забезпечуємо роботу 24/7 та оптимізуємо для пошукових систем.</p>
@@ -180,7 +180,7 @@
           <p>&#10004 Оптимізація швидкості</p>
           <p>&#10004 Підключення контактної форми</p>
         </div>
-        <button class="price__content__li__btn">Замовити</button>
+        <button class="price__content__li__btn" onclick="openOrderModal('single', 350)">Замовити</button>
       </li>
       <li class="price__content__li">
         <div class="price__content__li__title">
@@ -194,7 +194,7 @@
           <p>&#10004 Проста серверна частина</p>
           <p>&#10004 Адмін-панель для редагування 2–4 блоків</p>
         </div>
-        <button class="price__content__li__btn">Замовити</button>
+        <button class="price__content__li__btn" onclick="openOrderModal('landing', 450)">Замовити</button>
       </li>
       <li class="price__content__li">
         <div class="price__content__li__title">
@@ -209,7 +209,7 @@
           <p>&#10004 Форма зворотного зв'язку</p>
           <p>&#10004 Базова аналітика</p>
         </div>
-        <button class="price__content__li__btn">Замовити</button>
+        <button class="price__content__li__btn" onclick="openOrderModal('blog', 950)">Замовити</button>
       </li>
     </ul>
 </div>
@@ -317,12 +317,12 @@
 <div class="conteiner">
   <div class="calltoaction__content">
     <div class="calltoaction__content__img">
-      <img src="../img/call.PNG" alt="img"/>
+      <img src="img/call.PNG" alt="img"/>
     </div>
     <div class="calltoaction__content__text">
       <h2>Не знайшли відповіді?</h2>
       <p> Напишіть нам — з радістю допоможемо розібратись і підберемо найкраще рішення саме для вас.</p>
-      <a href="mailto:growthtech.contact@gmail.com">Написати нам</a>
+      <button onclick="openContactModal()">Написати нам</button>
     </div>
     
   </div>
@@ -331,7 +331,7 @@
 <footer class="footer">
 <div class="conteiner">
   <div class="footer__content">
-    <a href="/"><img src="../img/Logo.png" alt="logo" class="footer__content__logo" /></a>
+    <a href="/"><img src="img/Logo.png" alt="logo" class="footer__content__logo" /></a>
     <div class="footer__content__text">
      <p> 2025 Growth-Tech Agency |  Всі права захищені ©</p>
       <div class="footer__content__text__document">
@@ -348,12 +348,144 @@
 </div>
 </footer>
 
+<!-- Order Modal -->
+<div id="orderModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeOrderModal()">&times;</span>
+    <h2>Оформити замовлення</h2>
+    <form id="orderForm">
+      <div class="form-group">
+        <label for="firstName">Ім'я *</label>
+        <input type="text" id="firstName" name="firstName" required>
+      </div>
+      <div class="form-group">
+        <label for="lastName">Прізвище *</label>
+        <input type="text" id="lastName" name="lastName" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="phone">Телефон *</label>
+        <input type="tel" id="phone" name="phone" required>
+      </div>
+      <div class="form-group">
+        <label for="packageType">Пакет</label>
+        <input type="text" id="packageType" name="packageType" readonly>
+      </div>
+      <div class="form-group">
+        <label for="orderPrice">Ціна</label>
+        <input type="text" id="orderPrice" name="price" readonly>
+      </div>
+      <button type="submit" class="submit-btn">Оформити замовлення</button>
+    </form>
+  </div>
+</div>
 
- 
+<!-- Contact Modal -->
+<div id="contactModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeContactModal()">&times;</span>
+    <h2>Зв'яжіться з нами</h2>
+    <form id="contactForm">
+      <div class="form-group">
+        <label for="contactName">Ім'я *</label>
+        <input type="text" id="contactName" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="contactEmail">Email *</label>
+        <input type="email" id="contactEmail" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="contactMessage">Повідомлення *</label>
+        <textarea id="contactMessage" name="message" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Надіслати</button>
+    </form>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeLoginModal()">&times;</span>
+    <h2>Вхід</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="loginEmail">Email *</label>
+        <input type="email" id="loginEmail" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Пароль *</label>
+        <input type="password" id="loginPassword" name="password" required>
+      </div>
+      <button type="submit" class="submit-btn">Увійти</button>
+    </form>
+    <div class="modal-footer">
+      <p>Ще не маєте акаунта? <a href="#" onclick="switchToRegister()">Зареєструватися</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- Register Modal -->
+<div id="registerModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeRegisterModal()">&times;</span>
+    <h2>Реєстрація</h2>
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="registerFirstName">Ім'я *</label>
+        <input type="text" id="registerFirstName" name="firstName" required>
+      </div>
+      <div class="form-group">
+        <label for="registerLastName">Прізвище *</label>
+        <input type="text" id="registerLastName" name="lastName" required>
+      </div>
+      <div class="form-group">
+        <label for="registerEmail">Email *</label>
+        <input type="email" id="registerEmail" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="registerPhone">Телефон *</label>
+        <input type="tel" id="registerPhone" name="phone" required>
+      </div>
+      <div class="form-group">
+        <label for="registerPassword">Пароль *</label>
+        <input type="password" id="registerPassword" name="password" required>
+      </div>
+      <button type="submit" class="submit-btn">Зареєструватися</button>
+    </form>
+    <div class="modal-footer">
+      <p>Вже маєте акаунт? <a href="#" onclick="switchToLogin()">Увійти</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- Popup Modal System -->
+<div id="popupModal" class="modal popup-modal">
+  <div class="modal-content popup-content">
+    <div class="popup-header">
+      <div class="popup-icon" id="popupIcon"></div>
+      <h3 id="popupTitle"></h3>
+      <span class="close" onclick="closePopup()">&times;</span>
+    </div>
+    <div class="popup-body">
+      <p id="popupMessage"></p>
+      <div id="popupInput" class="popup-input-container" style="display: none;">
+        <input type="text" id="popupInputField" placeholder="">
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button id="popupCancelBtn" class="popup-btn popup-btn-secondary" onclick="closePopup()">Скасувати</button>
+      <button id="popupConfirmBtn" class="popup-btn popup-btn-primary" onclick="confirmPopup()">OK</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="../script.js"></script>
-<script src="../lang.js"></script>
-<script src="../swiper.js"></script>
+<script src="script.js"></script>
+<script src="lang.js"></script>
+<script src="swiper.js"></script>
 </body>
 </html>

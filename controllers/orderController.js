@@ -11,6 +11,24 @@ const fs = require('fs');
 const createOrder = async (req, res) => {
   const { firstName, lastName, email, phone } = req.body;
 
+  // Input validation
+  if (!firstName || !lastName || !email || !phone) {
+    return res.status(400).json({ error: 'Всі поля є обов\'язковими' });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Неправильний формат email' });
+  }
+
+  if (firstName.length < 2 || lastName.length < 2) {
+    return res.status(400).json({ error: 'Ім\'я та прізвище мають бути довше 2 символів' });
+  }
+
+  if (phone.length < 10) {
+    return res.status(400).json({ error: 'Телефон має бути довше 10 символів' });
+  }
+
   try {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ error: 'Користувач вже існує' });
@@ -36,23 +54,47 @@ const createOrder = async (req, res) => {
 };
 
 const updateTemplate = async (req, res) => {
-  const { orderId } = req.params;
   const { template, blocks } = req.body;
+  const userId = req.user.userId;
 
   try {
-    const order = await Order.findById(orderId);
-    if (!order) return res.status(404).json({ error: 'Замовлення не знайдено' });
-
-    order.selectedTemplate = template;
-    if (blocks) {
+    let order = await Order.findOne({ user: userId });
+    
+    if (!order) {
+      // Create new order if doesn't exist
+      order = await Order.create({ 
+        user: userId,
+        selectedTemplate: template,
+        blocks: blocks
+      });
+    } else {
+      // Update existing order
+      order.selectedTemplate = template;
       order.blocks = blocks;
+      await order.save();
     }
-    await order.save();
 
-    res.status(200).json({ message: 'Шаблон оновлено' });
+    res.status(200).json({ message: 'Шаблон оновлено', order });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Помилка оновлення шаблону' });
+  }
+};
+
+const getMyOrder = async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const order = await Order.findOne({ user: userId }).populate('user', 'firstName lastName email phone');
+    
+    if (!order) {
+      return res.status(404).json({ error: 'Замовлення не знайдено' });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Помилка при отриманні замовлення' });
   }
 };
 
@@ -92,4 +134,4 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, updateTemplate, confirmOrder, getAllOrders };
+module.exports = { createOrder, updateTemplate, getMyOrder, confirmOrder, getAllOrders };

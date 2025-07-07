@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./routes/auth');
 const orderRoutes = require('./routes/orders');
+const contactRoutes = require('./routes/contact');
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/contact', contactRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => app.listen(process.env.PORT || 5000, () => console.log('Server running')))
