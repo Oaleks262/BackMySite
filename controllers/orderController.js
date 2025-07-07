@@ -38,15 +38,27 @@ const createOrder = async (req, res) => {
 
     const newUser = await User.create({ firstName, lastName, email, phone, password: hashedPassword });
     const newOrder = await Order.create({ user: newUser._id });
+    
+    console.log('New user created:', newUser.email, 'with password:', rawPassword);
+    console.log('New order created:', newOrder._id);
 
-    await sendEmail(email, 'Ваші дані для входу', `
-      <h2>Дякуємо за замовлення!</h2>
-      <p><strong>Ваш логін:</strong> ${email}</p>
-      <p><strong>Ваш пароль:</strong> ${rawPassword}</p>
-      <p>Увійдіть у свій кабінет, щоб завершити оформлення сайту.</p>
-    `);
+    try {
+      await sendEmail(email, 'Ваші дані для входу', `
+        <h2>Дякуємо за замовлення!</h2>
+        <p><strong>Ваш логін:</strong> ${email}</p>
+        <p><strong>Ваш пароль:</strong> ${rawPassword}</p>
+        <p>Увійдіть у свій кабінет, щоб завершити оформлення сайту.</p>
+      `);
+      console.log('Order created and email sent for:', email);
+    } catch (emailError) {
+      console.error('Email sending failed but order created:', emailError);
+    }
 
-    res.status(201).json({ message: 'Замовлення створено. Перевірте пошту.' });
+    res.status(201).json({ 
+      message: 'Замовлення створено. Перевірте пошту.',
+      orderId: newOrder._id,
+      userId: newUser._id
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Помилка при створенні замовлення.' });
@@ -57,6 +69,8 @@ const updateTemplate = async (req, res) => {
   const { template, blocks } = req.body;
   const userId = req.user.userId;
 
+  console.log('Update template request:', { userId, template, blocks: Object.keys(blocks || {}) });
+
   try {
     let order = await Order.findOne({ user: userId });
     
@@ -65,18 +79,22 @@ const updateTemplate = async (req, res) => {
       order = await Order.create({ 
         user: userId,
         selectedTemplate: template,
-        blocks: blocks
+        blocks: blocks,
+        status: 'draft'
       });
+      console.log('Created new order:', order._id);
     } else {
       // Update existing order
       order.selectedTemplate = template;
       order.blocks = blocks;
+      order.status = 'draft';
       await order.save();
+      console.log('Updated existing order:', order._id);
     }
 
     res.status(200).json({ message: 'Шаблон оновлено', order });
   } catch (error) {
-    console.error(error);
+    console.error('Update template error:', error);
     res.status(500).json({ error: 'Помилка оновлення шаблону' });
   }
 };
@@ -126,10 +144,11 @@ const confirmOrder = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate('user', 'firstName lastName email phone');
+    const orders = await Order.find().populate('user', 'firstName lastName email phone').sort({ createdAt: -1 });
+    console.log(`Retrieved ${orders.length} orders for admin`);
     res.status(200).json(orders);
   } catch (error) {
-    console.error(error);
+    console.error('Get all orders error:', error);
     res.status(500).json({ error: 'Помилка при отриманні замовлень' });
   }
 };

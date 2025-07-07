@@ -6,7 +6,10 @@ const auth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = {
+      ...decoded,
+      id: decoded.userId // додаємо також id для сумісності
+    };
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Недійсний токен' });
