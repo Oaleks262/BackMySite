@@ -27,6 +27,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
@@ -37,6 +45,16 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/website', websiteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/generated-websites', express.static(path.join(__dirname, 'generated-websites')));
+
+// Catch-all handler: serve index.html for all other routes (SPA fallback)
+app.get('*', (req, res) => {
+  // Check if it's an API route
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ message: 'API endpoint not found' });
+  }
+  // For all other routes, serve index.html (for SPA routing)
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Error handling middleware
 app.use((error, req, res, next) => {

@@ -2,7 +2,7 @@
 const API_CONFIG = {
   baseURL: window.location.hostname === 'localhost' 
     ? 'http://localhost:4444' 
-    : 'https://growth-tech.com.ua',
+    : '',
   
   endpoints: {
     auth: '/api/auth',
@@ -19,7 +19,9 @@ const API_CONFIG = {
 
 // Helper function to get full API URL
 function getAPIUrl(endpoint) {
-  return `${API_CONFIG.baseURL}${endpoint}`;
+  const fullUrl = `${API_CONFIG.baseURL}${endpoint}`;
+  console.log('API Request URL:', fullUrl);
+  return fullUrl;
 }
 
 const toggleBtn = document.getElementById("themeToggle");
@@ -291,6 +293,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   };
   
   try {
+    console.log('Attempting login with data:', { email: data.email, password: '[HIDDEN]' });
     const response = await fetch(getAPIUrl('/api/auth/login'), {
       method: 'POST',
       headers: {
@@ -299,7 +302,18 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       body: JSON.stringify(data)
     });
     
+    console.log('Login response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      console.error('Login response not OK:', response.status, response.statusText);
+      if (response.status === 404) {
+        showAlert('Сервер недоступний. Спробуйте пізніше.', 'error', 'Помилка підключення');
+        return;
+      }
+    }
+    
     const result = await response.json();
+    console.log('Login response:', result);
     
     if (response.ok) {
       localStorage.setItem('token', result.token);
@@ -309,9 +323,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       
       // Redirect to dashboard for regular users, admin panel for admins
       if (result.user.role === 'admin') {
-        window.location.href = '/admin.html';
+        window.location.href = '/admin';
       } else {
-        window.location.href = '/dashboard.html';
+        window.location.href = '/dashboard';
       }
     } else {
       showAlert('Помилка: ' + result.error, 'error', 'Помилка');
@@ -335,6 +349,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   };
   
   try {
+    console.log('Attempting registration with data:', data);
     const response = await fetch(getAPIUrl('/api/auth/register'), {
       method: 'POST',
       headers: {
@@ -343,7 +358,18 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
       body: JSON.stringify(data)
     });
     
+    console.log('Response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      console.error('Response not OK:', response.status, response.statusText);
+      if (response.status === 404) {
+        showAlert('Сервер недоступний. Спробуйте пізніше.', 'error', 'Помилка підключення');
+        return;
+      }
+    }
+    
     const result = await response.json();
+    console.log('Registration response:', result);
     
     if (response.ok) {
       localStorage.setItem('token', result.token);
@@ -352,7 +378,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
       closeRegisterModal();
       
       // Redirect to dashboard after registration
-      window.location.href = '/dashboard.html';
+      window.location.href = '/dashboard';
     } else {
       showAlert('Помилка: ' + result.error, 'error', 'Помилка');
     }
@@ -400,7 +426,7 @@ async function showAdminMenu() {
   const choice = await showConfirm(`Привіт, ${user.firstName}!\n\nОберіть дію:`, 'Адмін меню');
   
   if (choice) {
-    window.location.href = '/admin.html';
+    window.location.href = '/admin';
   } else {
     const logout = await showConfirm('Ви впевнені, що хочете вийти з акаунту?', 'Вихід з акаунту');
     if (logout) {
