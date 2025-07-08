@@ -512,7 +512,7 @@
   .header__mob__menu {
     position: fixed;
     top: 0;
-    left: -100%;
+    /* left: -100%; */
     width: 80%;
     height: 100vh;
     background: var(--color-background);
@@ -522,9 +522,9 @@
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
   }
   
-  .header__mob__menu.active {
-    left: 0;
-  }
+  /* .header__mob__menu.active {
+    /* left: 0; */
+  } */
   
   .header__mob__menu__list {
     list-style: none;
