@@ -1,3 +1,27 @@
+// API Configuration
+const API_CONFIG = {
+  baseURL: window.location.hostname === 'localhost' 
+    ? 'http://localhost:4444' 
+    : 'https://growth-tech.com.ua',
+  
+  endpoints: {
+    auth: '/api/auth',
+    orders: '/api/orders',
+    contact: '/api/contact',
+    payment: '/api/payment',
+    upload: '/api/upload',
+    templates: '/api/templates',
+    profile: '/api/profile',
+    website: '/api/website',
+    admin: '/api/admin'
+  }
+};
+
+// Helper function to get full API URL
+function getAPIUrl(endpoint) {
+  return `${API_CONFIG.baseURL}${endpoint}`;
+}
+
 const toggleBtn = document.getElementById("themeToggle");
 const icon = document.getElementById("icon");
 
