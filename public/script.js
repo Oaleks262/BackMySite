@@ -201,7 +201,7 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
   };
   
   try {
-    const response = await fetch('/api/orders/create', {
+    const response = await fetch(getAPIUrl('/api/orders/create'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -234,7 +234,7 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
   };
   
   try {
-    const response = await fetch('/api/contact', {
+    const response = await fetch(getAPIUrl('/api/contact'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -267,7 +267,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   };
   
   try {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(getAPIUrl('/api/auth/login'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -311,7 +311,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   };
   
   try {
-    const response = await fetch('/api/auth/register', {
+    const response = await fetch(getAPIUrl('/api/auth/register'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -559,7 +559,7 @@ async function initializeStripe() {
 
 async function createPaymentIntent(orderId) {
   try {
-    const response = await fetch('/api/payment/create-payment-intent', {
+    const response = await fetch(getAPIUrl('/api/payment/create-payment-intent'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -586,7 +586,7 @@ async function uploadFile(file) {
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await fetch('/api/upload/image', {
+    const response = await fetch(getAPIUrl('/api/upload/image'), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -609,7 +609,7 @@ async function uploadFile(file) {
 // Template Preview Functions
 async function loadTemplatePreview(templateId) {
   try {
-    const response = await fetch(`/api/templates/${templateId}/preview`);
+    const response = await fetch(getAPIUrl(`/api/templates/${templateId}/preview`));
     const html = await response.text();
     
     return html;
@@ -622,7 +622,7 @@ async function loadTemplatePreview(templateId) {
 // Profile Management Functions
 async function updateProfile(profileData) {
   try {
-    const response = await fetch('/api/profile', {
+    const response = await fetch(getAPIUrl('/api/profile'), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -645,7 +645,7 @@ async function updateProfile(profileData) {
 
 async function getUserOrders() {
   try {
-    const response = await fetch('/api/profile/orders', {
+    const response = await fetch(getAPIUrl('/api/profile/orders'), {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
@@ -666,7 +666,7 @@ async function getUserOrders() {
 // Website Generation Functions
 async function generateWebsite(orderId) {
   try {
-    const response = await fetch(`/api/website/generate/${orderId}`, {
+    const response = await fetch(getAPIUrl(`/api/website/generate/${orderId}`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`

@@ -523,8 +523,9 @@
   }
   
   /* .header__mob__menu.active {
-    /* left: 0; */
+    left: 0;
   } */
+
   
   .header__mob__menu__list {
     list-style: none;
