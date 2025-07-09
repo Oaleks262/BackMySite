@@ -8,6 +8,11 @@ const orderSchema = new mongoose.Schema({
     enum: ['draft', 'pending_payment', 'paid', 'in_progress', 'completed', 'cancelled', 'payment_failed']
   },
   selectedTemplate: String,
+  tariffType: { 
+    type: String, 
+    enum: ['single', 'landing', 'blog'],
+    default: null
+  },
   blocks: { type: Object, default: {} },
   confirmed: { type: Boolean, default: false },
   pdfUrl: String,

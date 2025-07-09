@@ -373,6 +373,7 @@
       <div class="form-group">
         <label for="packageType">Пакет</label>
         <input type="text" id="packageType" name="packageType" readonly>
+        <input type="hidden" id="tariffType" name="tariffType">
       </div>
       <div class="form-group">
         <label for="orderPrice">Ціна</label>
@@ -423,44 +424,10 @@
       <button type="submit" class="submit-btn">Увійти</button>
     </form>
     <div class="modal-footer">
-      <p>Ще не маєте акаунта? <a href="#" onclick="switchToRegister()">Зареєструватися</a></p>
     </div>
   </div>
 </div>
 
-<!-- Register Modal -->
-<div id="registerModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeRegisterModal()">&times;</span>
-    <h2>Реєстрація</h2>
-    <form id="registerForm">
-      <div class="form-group">
-        <label for="registerFirstName">Ім'я *</label>
-        <input type="text" id="registerFirstName" name="firstName" required>
-      </div>
-      <div class="form-group">
-        <label for="registerLastName">Прізвище *</label>
-        <input type="text" id="registerLastName" name="lastName" required>
-      </div>
-      <div class="form-group">
-        <label for="registerEmail">Email *</label>
-        <input type="email" id="registerEmail" name="email" required>
-      </div>
-      <div class="form-group">
-        <label for="registerPhone">Телефон *</label>
-        <input type="tel" id="registerPhone" name="phone" required>
-      </div>
-      <div class="form-group">
-        <label for="registerPassword">Пароль *</label>
-        <input type="password" id="registerPassword" name="password" required>
-      </div>
-      <button type="submit" class="submit-btn">Зареєструватися</button>
-    </form>
-    <div class="modal-footer">
-      <p>Вже маєте акаунт? <a href="#" onclick="switchToLogin()">Увійти</a></p>
-    </div>
-  </div>
-</div>
 
 <!-- Popup Modal System -->
 <div id="popupModal" class="modal popup-modal">

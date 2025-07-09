@@ -2,7 +2,7 @@
 const API_CONFIG = {
   baseURL: window.location.hostname === 'localhost' 
     ? 'http://localhost:4444' 
-    : '',
+    : 'https://growth-tech.com.ua',
   
   endpoints: {
     auth: '/api/auth',
@@ -131,6 +131,7 @@ function openOrderModal(packageType, price) {
     const modal = document.getElementById('orderModal');
     const packageInput = document.getElementById('packageType');
     const priceInput = document.getElementById('orderPrice');
+    const tariffTypeInput = document.getElementById('tariffType');
     
     const packageNames = {
       'single': 'Односторінковий сайт',
@@ -141,6 +142,11 @@ function openOrderModal(packageType, price) {
     // Set package name
     if (packageInput) {
       packageInput.value = packageNames[packageType] || packageType;
+    }
+    
+    // Set tariff type
+    if (tariffTypeInput) {
+      tariffTypeInput.value = packageType;
     }
     
     // Set price
@@ -175,30 +181,13 @@ function closeLoginModal() {
   document.getElementById('loginModal').style.display = 'none';
 }
 
-function openRegisterModal() {
-  document.getElementById('registerModal').style.display = 'block';
-}
 
-function closeRegisterModal() {
-  document.getElementById('registerModal').style.display = 'none';
-}
-
-function switchToRegister() {
-  closeLoginModal();
-  openRegisterModal();
-}
-
-function switchToLogin() {
-  closeRegisterModal();
-  openLoginModal();
-}
 
 // Close modals when clicking outside
 window.onclick = function(event) {
   const orderModal = document.getElementById('orderModal');
   const contactModal = document.getElementById('contactModal');
   const loginModal = document.getElementById('loginModal');
-  const registerModal = document.getElementById('registerModal');
   
   if (event.target === orderModal) {
     orderModal.style.display = 'none';
@@ -208,9 +197,6 @@ window.onclick = function(event) {
   }
   if (event.target === loginModal) {
     loginModal.style.display = 'none';
-  }
-  if (event.target === registerModal) {
-    registerModal.style.display = 'none';
   }
 }
 
@@ -223,7 +209,8 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
     firstName: formData.get('firstName'),
     lastName: formData.get('lastName'),
     email: formData.get('email'),
-    phone: formData.get('phone')
+    phone: formData.get('phone'),
+    tariffType: formData.get('tariffType')
   };
   
   try {
@@ -335,57 +322,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
 });
 
-// Register form submission
-document.getElementById('registerForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const formData = new FormData(e.target);
-  const data = {
-    firstName: formData.get('firstName'),
-    lastName: formData.get('lastName'),
-    email: formData.get('email'),
-    phone: formData.get('phone'),
-    password: formData.get('password')
-  };
-  
-  try {
-    console.log('Attempting registration with data:', data);
-    const response = await fetch(getAPIUrl('/api/auth/register'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    });
-    
-    console.log('Response status:', response.status, response.statusText);
-    
-    if (!response.ok) {
-      console.error('Response not OK:', response.status, response.statusText);
-      if (response.status === 404) {
-        showAlert('Сервер недоступний. Спробуйте пізніше.', 'error', 'Помилка підключення');
-        return;
-      }
-    }
-    
-    const result = await response.json();
-    console.log('Registration response:', result);
-    
-    if (response.ok) {
-      localStorage.setItem('token', result.token);
-      localStorage.setItem('user', JSON.stringify(result.user));
-      showAlert('Реєстрація успішна!', 'success', 'Успіх');
-      closeRegisterModal();
-      
-      // Redirect to dashboard after registration
-      window.location.href = '/dashboard';
-    } else {
-      showAlert('Помилка: ' + result.error, 'error', 'Помилка');
-    }
-  } catch (error) {
-    showAlert('Помилка при реєстрації. Спробуйте пізніше.', 'error', 'Помилка');
-  }
-});
 
 // Update user interface based on login state
 function updateUserInterface() {

@@ -79,7 +79,6 @@ npm start
 ## API Endpoints
 
 ### Аутентифікація
-- POST `/api/auth/register` - Реєстрація
 - POST `/api/auth/login` - Вхід
 
 ### Замовлення

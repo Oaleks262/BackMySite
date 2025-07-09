@@ -94,7 +94,7 @@ pm2 logs growth-tech-api
 netstat -tulpn | grep :4444
 
 # Тестувати API
-curl http://localhost:4444/api/auth/register
+curl https://growth-tech.com.ua/api/auth/login
 ```
 
 ## Альтернативний спосіб (без nginx)

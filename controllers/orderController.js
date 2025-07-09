@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 
 const createOrder = async (req, res) => {
-  const { firstName, lastName, email, phone } = req.body;
+  const { firstName, lastName, email, phone, tariffType } = req.body;
 
   // Input validation
   if (!firstName || !lastName || !email || !phone) {
@@ -37,7 +37,7 @@ const createOrder = async (req, res) => {
     const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
     const newUser = await User.create({ firstName, lastName, email, phone, password: hashedPassword });
-    const newOrder = await Order.create({ user: newUser._id });
+    const newOrder = await Order.create({ user: newUser._id, tariffType });
     
     console.log('New user created:', newUser.email, 'with password:', rawPassword);
     console.log('New order created:', newOrder._id);
