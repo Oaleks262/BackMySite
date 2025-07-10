@@ -16,6 +16,7 @@ const adminRoutes = require('./routes/admin');
 // Load environment variables
 const envResult = dotenv.config();
 
+
 if (envResult.error) {
   console.error('❌ Error loading .env file:', envResult.error);
   console.log('Current working directory:', process.cwd());
