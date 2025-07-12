@@ -65,12 +65,36 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('userNameDisplay').textContent = `${user.firstName} ${user.lastName}`;
   document.getElementById('userNameDisplay').onclick = showUserMenu;
   
+  // Update mobile user display
+  const mobileUserDisplay = document.getElementById('userNameDisplayMob');
+  if (mobileUserDisplay) {
+    mobileUserDisplay.textContent = `${user.firstName} ${user.lastName}`;
+    mobileUserDisplay.onclick = showUserMenu;
+  }
+  
   // Initialize theme
   const saved = localStorage.getItem("theme") || "light";
   setTheme(saved);
   
   // Load existing order if any
   loadUserOrder();
+  
+  // Set up password change button listeners
+  const passwordBtn = document.getElementById('passwordChangeBtn');
+  if (passwordBtn) {
+    passwordBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openPasswordModal();
+    });
+  }
+  
+  const passwordBtnMob = document.getElementById('passwordChangeBtnMob');
+  if (passwordBtnMob) {
+    passwordBtnMob.addEventListener('click', function(e) {
+      e.preventDefault();
+      openPasswordModal();
+    });
+  }
   
   // Set up template selection will be called after loading order
 });
@@ -1221,13 +1245,32 @@ function validateOrderData(data) {
 
 // Password change functionality
 function openPasswordModal() {
-  document.getElementById('passwordModal').style.display = 'block';
+  console.log('openPasswordModal called');
+  const modal = document.getElementById('passwordModal');
+  if (modal) {
+    modal.style.display = 'block';
+    console.log('Password modal opened');
+  } else {
+    console.error('Password modal not found');
+  }
 }
 
 function closePasswordModal() {
-  document.getElementById('passwordModal').style.display = 'none';
-  document.getElementById('passwordForm').reset();
+  console.log('closePasswordModal called');
+  const modal = document.getElementById('passwordModal');
+  const form = document.getElementById('passwordForm');
+  
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  if (form) {
+    form.reset();
+  }
 }
+
+// Make functions globally available
+window.openPasswordModal = openPasswordModal;
+window.closePasswordModal = closePasswordModal;
 
 // Password form submission
 document.addEventListener('DOMContentLoaded', function() {
@@ -1243,7 +1286,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Validate passwords match
       if (newPassword !== confirmPassword) {
-        showAlert('Нові паролі не співпадають', 'error', 'Помилка');
+        alert('Нові паролі не співпадають');
         return;
       }
       
@@ -1264,14 +1307,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const result = await response.json();
         
         if (response.ok) {
-          showAlert('Пароль успішно змінено!', 'success', 'Успіх');
+          alert('Пароль успішно змінено!');
           closePasswordModal();
         } else {
-          showAlert(result.error || 'Помилка при зміні пароля', 'error', 'Помилка');
+          alert(result.error || 'Помилка при зміні пароля');
         }
       } catch (error) {
         console.error('Password change error:', error);
-        showAlert('Помилка при зміні пароля. Спробуйте пізніше.', 'error', 'Помилка');
+        alert('Помилка при зміні пароля. Спробуйте пізніше.');
       }
     });
   }
@@ -1334,22 +1377,73 @@ document.getElementById("themeToggle").addEventListener("click", () => {
   setTheme(newTheme);
 });
 
+// Mobile theme toggle
+const mobileThemeToggle = document.getElementById("themeToggleMob");
+if (mobileThemeToggle) {
+  mobileThemeToggle.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme");
+    const newTheme = current === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+  });
+}
+
 function setTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem("theme", theme);
   const icon = document.getElementById("icon");
+  const iconMob = document.getElementById("iconMob");
+  const themeIcon = theme === "dark" ? "☀️" : "🌙";
+  
   if (icon) {
-    icon.textContent = theme === "dark" ? "☀️" : "🌙";
+    icon.textContent = themeIcon;
+  }
+  if (iconMob) {
+    iconMob.textContent = themeIcon;
   }
 }
 
 function showUserMenu() {
   const user = JSON.parse(localStorage.getItem('user'));
-  const choice = confirm(`Привіт, ${user.firstName}!\n\nВи хочете вийти з акаунту?`);
   
-  if (choice) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/';
+  // Create a better logout menu
+  const menuHtml = `
+    <div class="user-menu-overlay" onclick="closeUserMenu()">
+      <div class="user-menu" onclick="event.stopPropagation()">
+        <div class="user-info">
+          <h3>Привіт, ${user.firstName}!</h3>
+          <p>${user.email}</p>
+        </div>
+        <div class="menu-actions">
+          <button onclick="openPasswordModal()" class="menu-btn">
+            🔑 Змінити пароль
+          </button>
+          <button onclick="logout()" class="menu-btn logout-btn">
+            🚪 Вийти з акаунту
+          </button>
+          <button onclick="closeUserMenu()" class="menu-btn cancel-btn">
+            ❌ Скасувати
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add menu to page
+  const menuContainer = document.createElement('div');
+  menuContainer.innerHTML = menuHtml;
+  document.body.appendChild(menuContainer);
+}
+
+function closeUserMenu() {
+  const overlay = document.querySelector('.user-menu-overlay');
+  if (overlay) {
+    overlay.remove();
   }
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('theme');
+  window.location.href = '/';
 }

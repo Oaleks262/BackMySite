@@ -332,9 +332,15 @@ function updateUserInterface() {
     loginLinks.forEach(link => {
       link.textContent = `${user.firstName} ${user.lastName}`;
       if (user.role === 'admin') {
-        link.onclick = () => showAdminMenu();
+        link.onclick = () => showAdminPopup();
       } else {
-        link.onclick = () => showUserMenu();
+        link.onclick = () => {
+          if (typeof showUserMenu === 'function') {
+            showUserMenu();
+          } else {
+            showSimpleLogout();
+          }
+        };
       }
     });
   } else {
@@ -357,20 +363,73 @@ async function showUserMenu() {
   }
 }
 
-async function showAdminMenu() {
+// Admin popup with options
+function showAdminPopup() {
   const user = JSON.parse(localStorage.getItem('user'));
-  const choice = await showConfirm(`Привіт, ${user.firstName}!\n\nОберіть дію:`, 'Адмін меню');
+  
+  const popupHtml = `
+    <div class="modal" id="adminModal" onclick="closeAdminPopup()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close" onclick="closeAdminPopup()">&times;</span>
+        <h2>Привіт, ${user.firstName}!</h2>
+        <div class="admin-user-info">
+          <p><strong>Адміністратор</strong></p>
+          <p style="color: var(--color-muted); font-size: 14px; margin-bottom: 25px;">${user.email}</p>
+        </div>
+        <div class="admin-actions">
+          <button onclick="goToAdmin()" class="submit-btn admin-primary-btn">
+            Відкрити адмін панель
+          </button>
+          <button onclick="adminLogout()" class="submit-btn admin-danger-btn">
+            Вийти з акаунту
+          </button>
+          <button onclick="closeAdminPopup()" class="cancel-btn">
+            Скасувати
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  const popupContainer = document.createElement('div');
+  popupContainer.innerHTML = popupHtml;
+  document.body.appendChild(popupContainer);
+  
+  // Show modal with same animation as site
+  const modal = document.getElementById('adminModal');
+  modal.style.display = 'block';
+}
+
+function closeAdminPopup() {
+  const modal = document.getElementById('adminModal');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function goToAdmin() {
+  closeAdminPopup();
+  window.location.href = '/admin';
+}
+
+function adminLogout() {
+  closeAdminPopup();
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('theme');
+  window.location.href = '/';
+}
+
+// Simple logout fallback for pages without specific showUserMenu
+function showSimpleLogout() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const choice = confirm(`Привіт, ${user.firstName}!\n\nВи хочете вийти з акаунту?`);
   
   if (choice) {
-    window.location.href = '/admin';
-  } else {
-    const logout = await showConfirm('Ви впевнені, що хочете вийти з акаунту?', 'Вихід з акаунту');
-    if (logout) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      updateUserInterface();
-      showAlert('Ви вийшли з акаунту', 'info', 'Вихід');
-    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('theme');
+    window.location.href = '/';
   }
 }
 

@@ -2914,3 +2914,63 @@ li {
     margin: 20px 0 0 0;
   }
 }/*# sourceMappingURL=main.css.map */
+
+
+
+
+/* Admin Popup Additional Styles */
+.admin-user-info {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.admin-user-info p:first-child {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-primary-btn {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.admin-primary-btn:hover {
+  background-color: var(--color-secondary) !important;
+}
+
+.admin-danger-btn {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.admin-danger-btn:hover {
+  background-color: #c82333 !important;
+}
+
+.cancel-btn {
+  background-color: transparent !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  padding: 12px 24px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  transition: all 0.3s ease !important;
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+  font-weight: 400 !important;
+}
+
+.cancel-btn:hover {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-muted) !important;
+}

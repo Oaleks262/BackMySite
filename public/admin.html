@@ -28,7 +28,7 @@
       </a>
       <nav class="header__content__nav">
         <ul class="header__content__ul" style="justify-content: flex-end;">
-          <li class="header__content__li"><a href="#" onclick="openPasswordModal()">
+          <li class="header__content__li"><a href="#" id="passwordChangeBtn">
             Змінити пароль
           </a></li>
           <li class="header__content__li"><a href="#" id="userNameDisplay">
@@ -44,6 +44,42 @@
     </div>
   </div>
 </header>
+
+<div class="header__mob">
+  <div class="conteiner">
+    <div class="header__mob__content">
+      <a href="/" class="header__mob__content__logo">
+        <img src="img/Logo.png" alt="logo" width="40" />
+        <div class="header__mob__content__logo__text">
+          <p>Growth</p>
+          <p>Tech</p>
+        </div>
+      </a>
+      <button id="openMenu" aria-label="Відкрити меню">
+        <svg><use href="../icon/symbol-defs.svg#icon-menu"/></svg>
+      </button>
+    </div>
+
+    <div class="header__mob__menu" id="mobileMenu">
+      <div class="header__mob__menu__box">
+        <button id="closeMenu" aria-label="Закрити меню">
+          <svg><use href="../icon/symbol-defs.svg#icon-cross"/></svg>
+        </button>
+      </div>
+
+      <ul class="header__mob__menu__list">
+        <li class="header__mob__menu__list__li"><a href="/">Головна</a></li>
+        <li class="header__mob__menu__list__li"><a href="/#cont">Про нас</a></li>
+        <li class="header__mob__menu__list__li"><a href="/#price">Ціна</a></li>
+        <li class="header__mob__menu__list__li"><a href="#" id="passwordChangeBtnMob">Змінити пароль</a></li>
+        <li class="header__mob__menu__list__li"><a href="#" id="userNameDisplayMob">Адміністратор</a></li>
+        <li class="header__mob__menu__list__li" style="margin-top: 44px;">
+          <button style="box-shadow: 0px 1px 4px 0px var(--color-muted);" id="themeToggleMob"><span id="iconMob">🌙</span></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 <main class="admin">
   <div class="conteiner">
