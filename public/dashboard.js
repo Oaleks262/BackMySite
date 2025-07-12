@@ -97,6 +97,52 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Set up template selection will be called after loading order
+  
+  // Set up password form
+  const passwordForm = document.getElementById('passwordForm');
+  if (passwordForm) {
+    passwordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const currentPassword = formData.get('currentPassword');
+      const newPassword = formData.get('newPassword');
+      const confirmPassword = formData.get('confirmPassword');
+      
+      // Validate passwords match
+      if (newPassword !== confirmPassword) {
+        alert('Нові паролі не співпадають');
+        return;
+      }
+      
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(getAPIUrl('/api/auth/change-password'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          alert('Пароль успішно змінено!');
+          closePasswordModal();
+        } else {
+          alert(result.error || 'Помилка при зміні пароля');
+        }
+      } catch (error) {
+        console.error('Password change error:', error);
+        alert('Помилка при зміні пароля. Спробуйте пізніше.');
+      }
+    });
+  }
 });
 
 // Filter templates based on user's tariff type
@@ -1272,178 +1318,3 @@ function closePasswordModal() {
 window.openPasswordModal = openPasswordModal;
 window.closePasswordModal = closePasswordModal;
 
-// Password form submission
-document.addEventListener('DOMContentLoaded', function() {
-  const passwordForm = document.getElementById('passwordForm');
-  if (passwordForm) {
-    passwordForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const formData = new FormData(e.target);
-      const currentPassword = formData.get('currentPassword');
-      const newPassword = formData.get('newPassword');
-      const confirmPassword = formData.get('confirmPassword');
-      
-      // Validate passwords match
-      if (newPassword !== confirmPassword) {
-        alert('Нові паролі не співпадають');
-        return;
-      }
-      
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(getAPIUrl('/api/auth/change-password'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            currentPassword,
-            newPassword
-          })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok) {
-          alert('Пароль успішно змінено!');
-          closePasswordModal();
-        } else {
-          alert(result.error || 'Помилка при зміні пароля');
-        }
-      } catch (error) {
-        console.error('Password change error:', error);
-        alert('Помилка при зміні пароля. Спробуйте пізніше.');
-      }
-    });
-  }
-});
-
-// Close password modal when clicking outside
-window.addEventListener('click', function(event) {
-  const passwordModal = document.getElementById('passwordModal');
-  if (event.target === passwordModal) {
-    closePasswordModal();
-  }
-});
-
-// Load existing order and other utility functions
-async function loadUserOrder() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(getAPIUrl('/api/orders/my-order'), {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (response.ok) {
-      const order = await response.json();
-      if (order) {
-        currentOrder = order;
-        // Filter templates based on user's tariff type
-        filterTemplatesByTariff(order.tariffType);
-        
-        if (order.blocks) {
-          populateFormWithOrder(order);
-        }
-      }
-    }
-    
-    // Set up template selection after loading order
-    setupTemplateSelection();
-  } catch (error) {
-    console.error('Error loading order:', error);
-    // Still setup template selection even if loading fails
-    setupTemplateSelection();
-  }
-}
-
-function populateFormWithOrder(order) {
-  if (order.selectedTemplate) {
-    selectedTemplate = order.selectedTemplate;
-    const templateCard = document.querySelector(`[data-template="${order.selectedTemplate}"]`);
-    if (templateCard) {
-      templateCard.click();
-    }
-  }
-}
-
-// Theme and user functions
-document.getElementById("themeToggle").addEventListener("click", () => {
-  const current = document.documentElement.getAttribute("data-theme");
-  const newTheme = current === "dark" ? "light" : "dark";
-  setTheme(newTheme);
-});
-
-// Mobile theme toggle
-const mobileThemeToggle = document.getElementById("themeToggleMob");
-if (mobileThemeToggle) {
-  mobileThemeToggle.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme");
-    const newTheme = current === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-  });
-}
-
-function setTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem("theme", theme);
-  const icon = document.getElementById("icon");
-  const iconMob = document.getElementById("iconMob");
-  const themeIcon = theme === "dark" ? "☀️" : "🌙";
-  
-  if (icon) {
-    icon.textContent = themeIcon;
-  }
-  if (iconMob) {
-    iconMob.textContent = themeIcon;
-  }
-}
-
-function showUserMenu() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  
-  // Create a better logout menu
-  const menuHtml = `
-    <div class="user-menu-overlay" onclick="closeUserMenu()">
-      <div class="user-menu" onclick="event.stopPropagation()">
-        <div class="user-info">
-          <h3>Привіт, ${user.firstName}!</h3>
-          <p>${user.email}</p>
-        </div>
-        <div class="menu-actions">
-          <button onclick="openPasswordModal()" class="menu-btn">
-            🔑 Змінити пароль
-          </button>
-          <button onclick="logout()" class="menu-btn logout-btn">
-            🚪 Вийти з акаунту
-          </button>
-          <button onclick="closeUserMenu()" class="menu-btn cancel-btn">
-            ❌ Скасувати
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Add menu to page
-  const menuContainer = document.createElement('div');
-  menuContainer.innerHTML = menuHtml;
-  document.body.appendChild(menuContainer);
-}
-
-function closeUserMenu() {
-  const overlay = document.querySelector('.user-menu-overlay');
-  if (overlay) {
-    overlay.remove();
-  }
-}
-
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  localStorage.removeItem('theme');
-  window.location.href = '/';
-}
