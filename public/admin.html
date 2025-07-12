@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Адмін панель - Growth-tech</title>
+</head>
+<body class="card">
+<header class="header">
+  <div class="conteiner">
+    <div class="header__content">
+      <nav class="header__content__nav">
+        <ul class="header__content__ul">
+          <li class="header__content__li"><a href="/">Головна</a></li>
+          <li class="header__content__li"><a href="/#cont">Про нас</a></li>
+          <li class="header__content__li"><a href="/#price">Ціна</a></li>
+        </ul>
+      </nav>
+      <a href="/" class="header__content__logo">
+        <img src="img/Logo.png" alt="logo">
+        <div class="header__content__logo__text">
+            <p>Growth</p>
+            <p>Tech</p>
+        </div>
+      </a>
+      <nav class="header__content__nav">
+        <ul class="header__content__ul" style="justify-content: flex-end;">
+          <li class="header__content__li"><a href="#" onclick="openPasswordModal()">
+            Змінити пароль
+          </a></li>
+          <li class="header__content__li"><a href="#" id="userNameDisplay">
+            Адміністратор
+          </a></li>
+          <li style="box-shadow: 0px 1px 4px 0px var(--color-muted);" class="header__content__li">  
+            <button id="themeToggle" aria-label="Перемкнути тему">
+            <span id="icon">🌙</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="admin">
+  <div class="conteiner">
+    <div class="admin__content">
+      <div class="admin__header">
+        <h1>Адмін панель</h1>
+        <p>Керування замовленнями та користувачами</p>
+      </div>
+
+      <div class="admin__stats">
+        <div class="stat-card">
+          <h3>Всього замовлень</h3>
+          <span id="totalOrders">0</span>
+        </div>
+        <div class="stat-card">
+          <h3>Нові замовлення</h3>
+          <span id="newOrders">0</span>
+        </div>
+        <div class="stat-card">
+          <h3>Підтверджені</h3>
+          <span id="confirmedOrders">0</span>
+        </div>
+      </div>
+
+      <div class="orders-section">
+        <div class="section-header">
+          <h2>Замовлення</h2>
+          <div class="filters">
+            <select id="statusFilter">
+              <option value="">Всі статуси</option>
+              <option value="draft">Чернетка</option>
+              <option value="completed">Завершено</option>
+            </select>
+            <button id="refreshBtn" class="refresh-btn">Оновити</button>
+          </div>
+        </div>
+
+        <div class="orders-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Клієнт</th>
+                <th>Email</th>
+                <th>Телефон</th>
+                <th>Шаблон</th>
+                <th>Статус</th>
+                <th>Дата створення</th>
+                <th>Дії</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr>
+                <td colspan="8" class="loading">Завантаження...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<!-- Order Details Modal -->
+<div id="orderDetailsModal" class="modal">
+  <div class="modal-content large">
+    <span class="close" onclick="closeOrderDetails()">&times;</span>
+    <h2>Деталі замовлення</h2>
+    <div id="orderDetailsContent">
+      <!-- Order details will be loaded here -->
+    </div>
+    <div class="modal-actions">
+      <button id="confirmOrderBtn" class="action-btn confirm">Підтвердити замовлення</button>
+      <button id="deleteOrderBtn" class="action-btn delete">Видалити замовлення</button>
+    </div>
+  </div>
+</div>
+
+<!-- Popup Modal System -->
+<div id="popupModal" class="modal popup-modal">
+  <div class="modal-content popup-content">
+    <div class="popup-header">
+      <div class="popup-icon" id="popupIcon"></div>
+      <h3 id="popupTitle"></h3>
+      <span class="close" onclick="closePopup()">&times;</span>
+    </div>
+    <div class="popup-body">
+      <p id="popupMessage"></p>
+      <div id="popupInput" class="popup-input-container" style="display: none;">
+        <input type="text" id="popupInputField" placeholder="">
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button id="popupCancelBtn" class="popup-btn popup-btn-secondary" onclick="closePopup()">Скасувати</button>
+      <button id="popupConfirmBtn" class="popup-btn popup-btn-primary" onclick="confirmPopup()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Password Change Modal -->
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePasswordModal()">&times;</span>
+    <h2>Змінити пароль</h2>
+    <form id="passwordForm">
+      <div class="form-group">
+        <label for="currentPassword">Поточний пароль *</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+      </div>
+      <div class="form-group">
+        <label for="newPassword">Новий пароль *</label>
+        <input type="password" id="newPassword" name="newPassword" required minlength="6">
+        <small>Мінімум 6 символів</small>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Підтвердити новий пароль *</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+      </div>
+      <button type="submit" class="submit-btn">Змінити пароль</button>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Кабінет користувача - Growth-tech</title>
+</head>
+<body class="card">
+<header class="header">
+  <div class="conteiner">
+    <div class="header__content">
+      <nav class="header__content__nav">
+        <ul class="header__content__ul">
+          <li class="header__content__li"><a href="/">Головна</a></li>
+          <li class="header__content__li"><a href="/#cont">Про нас</a></li>
+          <li class="header__content__li"><a href="/#price">Ціна</a></li>
+        </ul>
+      </nav>
+      <a href="/" class="header__content__logo">
+        <img src="img/Logo.png" alt="logo">
+        <div class="header__content__logo__text">
+            <p>Growth</p>
+            <p>Tech</p>
+        </div>
+      </a>
+      <nav class="header__content__nav">
+        <ul class="header__content__ul" style="justify-content: flex-end;">
+          <li class="header__content__li"><a href="#" onclick="openPasswordModal()">
+            Змінити пароль
+          </a></li>
+          <li class="header__content__li"><a href="#" id="userNameDisplay">
+            Користувач
+          </a></li>
+          <li style="box-shadow: 0px 1px 4px 0px var(--color-muted);" class="header__content__li">  
+            <button id="themeToggle" aria-label="Перемкнути тему">
+            <span id="icon">🌙</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard">
+  <div class="conteiner">
+    <div class="dashboard__content">
+      <div class="dashboard__header">
+        <h1>Кабінет користувача</h1>
+        <p>Оберіть шаблон та налаштуйте секції для вашого сайту</p>
+      </div>
+
+      <!-- Template Selection -->
+      <section class="template-selection">
+        <h2>Оберіть шаблон</h2>
+        <div class="template-grid">
+          <div class="template-card" data-template="single" data-price="350">
+            <img src="img/template-onepage.jpg" alt="Односторінковий сайт" onerror="this.src='img/hero.PNG'">
+            <div class="template-badge green">🟢</div>
+            <h3>Односторінковий сайт</h3>
+            <p>Підходить для презентації однієї послуги або продукту</p>
+            <div class="template-structure">
+              <small>Структура: Hero → Про нас → Переваги → Послуги → Відгуки → Контакти</small>
+            </div>
+            <div class="template-info">
+              <span class="template-price">від $350</span>
+            </div>
+          </div>
+          <div class="template-card" data-template="landing" data-price="450">
+            <img src="img/template-landing.jpg" alt="Лендінг 2-4 сторінки" onerror="this.src='img/contentUXUI.PNG'">
+            <div class="template-badge yellow">🟡</div>
+            <h3>Лендінг від 2 до 4 сторінок</h3>
+            <p>Для складнішої структури та сегментації контенту</p>
+            <div class="template-structure">
+              <small>Сторінки: Головна → Послуги → Про нас → Контакти + Опціонально відгуки</small>
+            </div>
+            <div class="template-info">
+              <span class="template-price">від $450</span>
+            </div>
+          </div>
+          <div class="template-card" data-template="blog" data-price="950">
+            <img src="img/template-blog.jpg" alt="Блог/Статейний сайт" onerror="this.src='img/contentDeploi.PNG'">
+            <div class="template-badge blue">🔵</div>
+            <h3>Блог / Статейний сайт</h3>
+            <p>Головна з публікаціями, сторінки статей, пошук, коментарі</p>
+            <div class="template-structure">
+              <small>Структура: Головна → Сторінка статті → Про автора → Контакти</small>
+            </div>
+            <div class="template-info">
+              <span class="template-price">від $950</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Website Sections Configuration -->
+      <section class="sections-config" id="sectionsConfig" style="display: none;">
+        <h2 id="configTitle">Налаштування секцій сайту</h2>
+        <div id="dynamicSections">
+          <!-- Dynamic sections will be loaded here based on template -->
+        </div>
+
+        <!-- Terms and Order -->
+        <div class="section-block terms-section">
+          <div class="checkbox-group">
+            <input type="checkbox" id="agreeTerms" required>
+            <label for="agreeTerms">
+              Я погоджуюся з <a href="document/rules.pdf" target="_blank">умовами користування</a> 
+              та <a href="document/policy.pdf" target="_blank">політикою конфіденційності</a>
+            </label>
+          </div>
+          
+          <div class="order-summary">
+            <h3>Підсумок замовлення</h3>
+            <p><strong>Обраний шаблон:</strong> <span id="selectedTemplate">Не обрано</span></p>
+            <p><strong>Конфігурація:</strong> <span id="configSummary">-</span></p>
+            <p class="total-price"><strong>Орієнтовна ціна:</strong> <span id="estimatedPrice">від $350</span></p>
+          </div>
+
+          <button type="button" class="order-btn" id="finalOrderBtn" disabled>
+            Підтвердити замовлення
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- Popup Modal System -->
+<div id="popupModal" class="modal popup-modal">
+  <div class="modal-content popup-content">
+    <div class="popup-header">
+      <div class="popup-icon" id="popupIcon"></div>
+      <h3 id="popupTitle"></h3>
+      <span class="close" onclick="closePopup()">&times;</span>
+    </div>
+    <div class="popup-body">
+      <p id="popupMessage"></p>
+      <div id="popupInput" class="popup-input-container" style="display: none;">
+        <input type="text" id="popupInputField" placeholder="">
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button id="popupCancelBtn" class="popup-btn popup-btn-secondary" onclick="closePopup()">Скасувати</button>
+      <button id="popupConfirmBtn" class="popup-btn popup-btn-primary" onclick="confirmPopup()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Password Change Modal -->
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePasswordModal()">&times;</span>
+    <h2>Змінити пароль</h2>
+    <form id="passwordForm">
+      <div class="form-group">
+        <label for="currentPassword">Поточний пароль *</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+      </div>
+      <div class="form-group">
+        <label for="newPassword">Новий пароль *</label>
+        <input type="password" id="newPassword" name="newPassword" required minlength="6">
+        <small>Мінімум 6 символів</small>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Підтвердити новий пароль *</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+      </div>
+      <button type="submit" class="submit-btn">Змінити пароль</button>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
