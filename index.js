@@ -86,6 +86,13 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'API endpoint not found' });
   }
+  // Check if it's a specific page that should have its own file
+  if (req.path === '/admin' || req.path === '/admin.html') {
+    return res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  }
+  if (req.path === '/dashboard' || req.path === '/dashboard.html') {
+    return res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  }
   // For all other routes, serve index.html (for SPA routing)
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
