@@ -58,6 +58,28 @@ pm2 startup
 ```
 
 ### 5. Налаштувати Nginx (якщо використовується)
+
+#### Встановити Nginx:
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install nginx
+
+# CentOS/RHEL
+sudo yum install nginx
+
+# Запустити та увімкнути автозапуск
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+
+#### Створити конфігурацію сайту:
+```bash
+# Створити файл конфігурації
+sudo nano /etc/nginx/sites-available/growth-tech
+```
+
+#### Додати конфігурацію:
 ```nginx
 server {
     listen 80;
@@ -82,6 +104,55 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 }
+```
+
+#### Активувати конфігурацію:
+```bash
+# Увімкнути сайт
+sudo ln -s /etc/nginx/sites-available/growth-tech /etc/nginx/sites-enabled/
+
+# Вимкнути дефолтний сайт (опціонально)
+sudo rm /etc/nginx/sites-enabled/default
+
+# Перевірити конфігурацію
+sudo nginx -t
+
+# Перезапустити Nginx
+sudo systemctl reload nginx
+```
+
+#### Альтернативний спосіб - використовувати автоматичне створення:
+```bash
+# Створити та налаштувати конфігурацію одразу
+sudo tee /etc/nginx/sites-available/growth-tech << 'EOF'
+server {
+    listen 80;
+    server_name growth-tech.com.ua;
+    
+    # Статичні файли
+    location / {
+        root /var/www/BackMySite/public;
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # API проксі
+    location /api/ {
+        proxy_pass http://localhost:4444;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+EOF
+
+# Увімкнути сайт та перезапустити
+sudo ln -s /etc/nginx/sites-available/growth-tech /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
 ### 6. Перевірити статус
