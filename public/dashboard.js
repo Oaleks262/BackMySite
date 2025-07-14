@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Validate passwords match
       if (newPassword !== confirmPassword) {
-        alert('Нові паролі не співпадають');
+        showAlert('Нові паролі не співпадають', 'error');
         return;
       }
       
@@ -155,14 +155,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const result = await response.json();
         
         if (response.ok) {
-          alert('Пароль успішно змінено!');
+          showAlert('Пароль успішно змінено!', 'success');
           closePasswordModal();
         } else {
-          alert(result.error || 'Помилка при зміні пароля');
+          showAlert(result.error || 'Помилка при зміні пароля', 'error');
         }
       } catch (error) {
         console.error('Password change error:', error);
-        alert('Помилка при зміні пароля. Спробуйте пізніше.');
+        showAlert('Помилка при зміні пароля. Спробуйте пізніше.', 'error');
       }
     });
   }
@@ -1320,7 +1320,15 @@ function openPasswordModal() {
   
   if (modal) {
     modal.style.display = 'block';
+    modal.style.zIndex = '1001';
+    modal.classList.add('show');
     console.log('Password modal opened successfully');
+    
+    // Clear form
+    const form = document.getElementById('passwordForm');
+    if (form) {
+      form.reset();
+    }
     
     // Focus first input
     const firstInput = modal.querySelector('input[type="password"]');
@@ -1343,6 +1351,7 @@ function closePasswordModal() {
   
   if (modal) {
     modal.style.display = 'none';
+    modal.classList.remove('show');
   }
   if (form) {
     form.reset();
