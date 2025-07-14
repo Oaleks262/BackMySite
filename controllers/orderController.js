@@ -155,6 +155,9 @@ const getMyOrder = async (req, res) => {
 
 const confirmOrder = async (req, res) => {
   const { orderId } = req.params;
+  
+  console.log('confirmOrder викликано для orderId:', orderId);
+  console.log('User від auth middleware:', req.user);
 
   try {
     const order = await Order.findById(orderId).populate('user');
@@ -174,8 +177,13 @@ const confirmOrder = async (req, res) => {
 
     res.status(200).json({ message: 'Замовлення підтверджено' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Помилка підтвердження замовлення' });
+    console.error('Детальна помилка в confirmOrder:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Помилка підтвердження замовлення', 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
