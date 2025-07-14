@@ -63,13 +63,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Update user display
   document.getElementById('userNameDisplay').textContent = `${user.firstName} ${user.lastName}`;
-  document.getElementById('userNameDisplay').onclick = showUserMenu;
   
   // Update mobile user display
   const mobileUserDisplay = document.getElementById('userNameDisplayMob');
   if (mobileUserDisplay) {
     mobileUserDisplay.textContent = `${user.firstName} ${user.lastName}`;
-    mobileUserDisplay.onclick = showUserMenu;
   }
   
   // Initialize theme
@@ -82,17 +80,42 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up password change button listeners
   const passwordBtn = document.getElementById('passwordChangeBtn');
   if (passwordBtn) {
+    console.log('Password button found, adding event listener');
     passwordBtn.addEventListener('click', function(e) {
       e.preventDefault();
+      console.log('Password button clicked');
       openPasswordModal();
     });
+  } else {
+    console.error('Password button not found');
   }
   
   const passwordBtnMob = document.getElementById('passwordChangeBtnMob');
   if (passwordBtnMob) {
+    console.log('Mobile password button found, adding event listener');
     passwordBtnMob.addEventListener('click', function(e) {
       e.preventDefault();
+      console.log('Mobile password button clicked');
       openPasswordModal();
+    });
+  } else {
+    console.error('Mobile password button not found');
+  }
+  
+  // Set up logout button listeners
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      logout();
+    });
+  }
+  
+  const logoutBtnMob = document.getElementById('logoutBtnMob');
+  if (logoutBtnMob) {
+    logoutBtnMob.addEventListener('click', function(e) {
+      e.preventDefault();
+      logout();
     });
   }
   
@@ -1293,11 +1316,23 @@ function validateOrderData(data) {
 function openPasswordModal() {
   console.log('openPasswordModal called');
   const modal = document.getElementById('passwordModal');
+  console.log('Modal element:', modal);
+  
   if (modal) {
     modal.style.display = 'block';
-    console.log('Password modal opened');
+    console.log('Password modal opened successfully');
+    
+    // Focus first input
+    const firstInput = modal.querySelector('input[type="password"]');
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 100);
+    }
   } else {
-    console.error('Password modal not found');
+    console.error('Password modal not found in DOM');
+    
+    // Debug: list all elements with 'modal' in their id
+    const allElements = document.querySelectorAll('[id*="modal"], [id*="Modal"]');
+    console.log('All modal-related elements:', Array.from(allElements).map(el => el.id));
   }
 }
 
@@ -1314,7 +1349,314 @@ function closePasswordModal() {
   }
 }
 
+// Popup Modal System
+let popupCallback = null;
+let popupInputCallback = null;
+
+function showPopup(type, title, message, options = {}) {
+  const modal = document.getElementById('popupModal');
+  const icon = document.getElementById('popupIcon');
+  const titleEl = document.getElementById('popupTitle');
+  const messageEl = document.getElementById('popupMessage');
+  const inputContainer = document.getElementById('popupInput');
+  const inputField = document.getElementById('popupInputField');
+  const cancelBtn = document.getElementById('popupCancelBtn');
+  const confirmBtn = document.getElementById('popupConfirmBtn');
+  
+  // Set icon based on type
+  icon.className = `popup-icon ${type}`;
+  switch(type) {
+    case 'success':
+      icon.innerHTML = '✓';
+      break;
+    case 'error':
+      icon.innerHTML = '✕';
+      break;
+    case 'warning':
+      icon.innerHTML = '⚠';
+      break;
+    case 'info':
+      icon.innerHTML = 'i';
+      break;
+    case 'question':
+      icon.innerHTML = '?';
+      break;
+    default:
+      icon.innerHTML = 'i';
+  }
+  
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  
+  // Configure buttons
+  if (options.showCancel !== false) {
+    cancelBtn.style.display = 'block';
+    cancelBtn.textContent = options.cancelText || 'Скасувати';
+  } else {
+    cancelBtn.style.display = 'none';
+  }
+  
+  confirmBtn.textContent = options.confirmText || 'OK';
+  
+  // Handle input field
+  if (options.showInput) {
+    inputContainer.style.display = 'block';
+    inputField.placeholder = options.inputPlaceholder || '';
+    inputField.value = options.inputValue || '';
+    inputField.focus();
+  } else {
+    inputContainer.style.display = 'none';
+  }
+  
+  // Store callback
+  popupCallback = options.callback;
+  popupInputCallback = options.inputCallback;
+  
+  modal.style.display = 'block';
+  
+  // Focus confirm button if no input
+  if (!options.showInput) {
+    confirmBtn.focus();
+  }
+}
+
+function closePopup() {
+  const modal = document.getElementById('popupModal');
+  modal.style.display = 'none';
+  popupCallback = null;
+  popupInputCallback = null;
+}
+
+function confirmPopup() {
+  const inputField = document.getElementById('popupInputField');
+  const inputContainer = document.getElementById('popupInput');
+  
+  if (inputContainer.style.display !== 'none' && popupInputCallback) {
+    popupInputCallback(inputField.value);
+  } else if (popupCallback) {
+    popupCallback(true);
+  }
+  
+  closePopup();
+}
+
+// Custom alert function
+function showAlert(message, type = 'info', title = 'Повідомлення') {
+  return new Promise((resolve) => {
+    showPopup(type, title, message, {
+      showCancel: false,
+      callback: resolve
+    });
+  });
+}
+
+// Custom confirm function
+function showConfirm(message, title = 'Підтвердження') {
+  return new Promise((resolve) => {
+    showPopup('question', title, message, {
+      showCancel: true,
+      confirmText: 'Так',
+      cancelText: 'Ні',
+      callback: resolve
+    });
+  });
+}
+
+// Load user order function
+async function loadUserOrder() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl('/api/orders/my-order'), {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      const order = await response.json();
+      currentOrder = order;
+      
+      // Check if user has a specific tariff and filter templates
+      if (order && order.selectedTemplate) {
+        // User already has an order with template
+        filterTemplatesByTariff(order.selectedTemplate);
+        
+        // Load saved data into forms
+        if (order.blocks) {
+          loadTemplateData({blocks: order.blocks});
+        }
+      } else {
+        // New user, show all templates
+        setupTemplateSelection();
+      }
+    } else if (response.status === 404) {
+      // No existing order found, setup normal template selection
+      console.log('No existing order found, setting up template selection');
+      setupTemplateSelection();
+    } else {
+      // Other error, setup normal template selection
+      console.error('Error loading order:', response.status);
+      setupTemplateSelection();
+    }
+  } catch (error) {
+    console.error('Error loading user order:', error);
+    setupTemplateSelection();
+  }
+}
+
+// Load template data into forms
+function loadTemplateData(templateData) {
+  if (!templateData || !templateData.blocks) return;
+  
+  const blocks = templateData.blocks;
+  
+  try {
+    switch (blocks.type) {
+      case 'onepage':
+        loadOnePageData(blocks);
+        break;
+      case 'landing':
+        loadLandingData(blocks);
+        break;
+      case 'blog':
+        loadBlogData(blocks);
+        break;
+    }
+  } catch (error) {
+    console.error('Error loading template data:', error);
+  }
+}
+
+// Load one page data
+function loadOnePageData(blocks) {
+  // Hero section
+  if (blocks.hero) {
+    setValue('heroTitle', blocks.hero.title);
+    setValue('heroSubtitle', blocks.hero.subtitle);
+    setValue('heroButton', blocks.hero.buttonText);
+  }
+  
+  // About section
+  if (blocks.about) {
+    setValue('aboutTitle', blocks.about.title);
+    setValue('aboutText', blocks.about.text);
+  }
+  
+  // Benefits section
+  if (blocks.benefits) {
+    setValue('benefitsTitle', blocks.benefits.title);
+    loadListItems('benefitsList', blocks.benefits.items, ['title', 'description'], 'benefit');
+  }
+  
+  // Services section
+  if (blocks.services) {
+    setValue('servicesTitle', blocks.services.title);
+    loadListItems('servicesList', blocks.services.items, ['name', 'description'], 'service');
+  }
+  
+  // Testimonials section
+  if (blocks.testimonials) {
+    setValue('testimonialsTitle', blocks.testimonials.title);
+    loadListItems('testimonialsList', blocks.testimonials.items, ['name', 'company', 'text'], 'testimonial');
+  }
+  
+  // Contact section
+  if (blocks.contact) {
+    setValue('contactTitle', blocks.contact.title);
+    setValue('contactText', blocks.contact.text);
+    setValue('contactButton', blocks.contact.buttonText);
+  }
+  
+  // Footer section
+  if (blocks.footer) {
+    setValue('footerPhone', blocks.footer.phone);
+    setValue('footerEmail', blocks.footer.email);
+    setValue('footerAddress', blocks.footer.address);
+    setValue('socialLinks', blocks.footer.socialLinks);
+    setValue('copyrightText', blocks.footer.copyright);
+  }
+  
+  // Optional sections
+  if (blocks.portfolio) {
+    setCheckbox('includePortfolio', true);
+    togglePortfolioSection();
+    setValue('portfolioTitle', blocks.portfolio.title);
+    loadListItems('portfolioList', blocks.portfolio.items, ['name', 'description'], 'portfolio');
+  }
+  
+  if (blocks.faq) {
+    setCheckbox('includeFAQ', true);
+    toggleFAQSection();
+    setValue('faqTitle', blocks.faq.title);
+    loadListItems('faqList', blocks.faq.items, ['question', 'answer'], 'faq');
+  }
+}
+
+// Helper function to set input values
+function setValue(id, value) {
+  const element = document.getElementById(id);
+  if (element && value) {
+    element.value = value;
+  }
+}
+
+// Helper function to set checkbox values
+function setCheckbox(id, checked) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.checked = checked;
+  }
+}
+
+// Helper function to load list items
+function loadListItems(containerId, items, fields, itemClass) {
+  const container = document.getElementById(containerId);
+  if (!container || !items || !Array.isArray(items)) return;
+  
+  // Clear existing items except the first one
+  const existingItems = container.querySelectorAll(`.${itemClass}-item`);
+  for (let i = 1; i < existingItems.length; i++) {
+    existingItems[i].remove();
+  }
+  
+  // Fill items
+  items.forEach((item, index) => {
+    let itemElement;
+    if (index === 0) {
+      // Use existing first item
+      itemElement = container.querySelector(`.${itemClass}-item`);
+    } else {
+      // Create new item
+      itemElement = container.querySelector(`.${itemClass}-item`).cloneNode(true);
+      container.appendChild(itemElement);
+    }
+    
+    if (itemElement) {
+      fields.forEach(field => {
+        const input = itemElement.querySelector(`.${itemClass}-${field}`);
+        if (input && item[field]) {
+          input.value = item[field];
+        }
+      });
+    }
+  });
+}
+
+// Logout functionality
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = '/';
+}
+
 // Make functions globally available
 window.openPasswordModal = openPasswordModal;
 window.closePasswordModal = closePasswordModal;
+window.showPopup = showPopup;
+window.closePopup = closePopup;
+window.confirmPopup = confirmPopup;
+window.showAlert = showAlert;
+window.showConfirm = showConfirm;
+window.loadUserOrder = loadUserOrder;
+window.logout = logout;
 

@@ -776,7 +776,7 @@ async function handlePaymentClick(event) {
   } catch (error) {
     showAlert(`Помилка платежу: ${error.message}`, 'error');
   }
-});
+};
 } else {
   console.log('Order form not found');
 }

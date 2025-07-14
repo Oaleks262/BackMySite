@@ -3,10 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Кабінет користувача - Growth-tech | Особистий кабінет</title>
+    <meta name="description" content="Особистий кабінет Growth-tech. Керуйте своїми замовленнями, відстежуйте статус проектів та взаємодійте з нашою командою розробників.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://growth-tech.com.ua/dashboard.html">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Кабінет користувача - Growth-tech">
+    <meta property="og:description" content="Особистий кабінет для керування замовленнями та проектами">
+    <meta property="og:url" content="https://growth-tech.com.ua/dashboard.html">
+    <meta property="og:site_name" content="Growth-tech">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <title>Кабінет користувача - Growth-tech</title>
 </head>
 <body class="card">
 <header class="header">
@@ -31,9 +48,12 @@
           <li class="header__content__li"><a href="#" id="passwordChangeBtn">
             Змінити пароль
           </a></li>
-          <li class="header__content__li"><a href="#" id="userNameDisplay">
-            Користувач
+          <li class="header__content__li"><a href="#" id="logoutBtn">
+            Вийти
           </a></li>
+          <li class="header__content__li"><span id="userNameDisplay">
+            Користувач
+          </span></li>
           <li style="box-shadow: 0px 1px 4px 0px var(--color-muted);" class="header__content__li">  
             <button id="themeToggle" aria-label="Перемкнути тему">
             <span id="icon">🌙</span>
@@ -72,7 +92,8 @@
         <li class="header__mob__menu__list__li"><a href="/#cont">Про нас</a></li>
         <li class="header__mob__menu__list__li"><a href="/#price">Ціна</a></li>
         <li class="header__mob__menu__list__li"><a href="#" id="passwordChangeBtnMob">Змінити пароль</a></li>
-        <li class="header__mob__menu__list__li"><a href="#" id="userNameDisplayMob">Користувач</a></li>
+        <li class="header__mob__menu__list__li"><a href="#" id="logoutBtnMob">Вийти</a></li>
+        <li class="header__mob__menu__list__li"><span id="userNameDisplayMob">Користувач</span></li>
         <li class="header__mob__menu__list__li" style="margin-top: 44px;">
           <button style="box-shadow: 0px 1px 4px 0px var(--color-muted);" id="themeToggleMob"><span id="iconMob">🌙</span></button>
         </li>
