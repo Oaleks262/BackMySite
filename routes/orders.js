@@ -13,7 +13,8 @@ router.post('/create', createOrder);
 router.post('/update-template', auth, updateTemplate);
 router.get('/my-order', auth, getMyOrder);
 router.put('/template/:orderId', updateTemplate);
-router.put('/confirm/:orderId', confirmOrder);
+router.put('/confirm/:orderId', auth, isAdmin, confirmOrder);
+router.patch('/confirm/:orderId', auth, isAdmin, confirmOrder);
 router.get('/all', auth, isAdmin, getAllOrders);
 
 module.exports = router;
