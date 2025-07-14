@@ -5,7 +5,14 @@ const path = require('path');
 
 const generatePDF = async (order) => {
   const doc = new PDFDocument();
-  const filePath = path.join(__dirname, `../public/pdfs/contract_${order._id}.pdf`);
+  const pdfDir = path.join(__dirname, '../public/pdfs');
+  const filePath = path.join(pdfDir, `contract_${order._id}.pdf`);
+  
+  // Створити директорію якщо не існує
+  if (!fs.existsSync(pdfDir)) {
+    fs.mkdirSync(pdfDir, { recursive: true });
+  }
+  
   const writeStream = fs.createWriteStream(filePath);
 
   // ✅ підключення шрифту з кирилицею
