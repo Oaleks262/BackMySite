@@ -23,9 +23,19 @@ const API_CONFIG = {
 
 // Helper function to get full API URL
 function getAPIUrl(endpoint) {
-  const fullUrl = `${API_CONFIG.baseURL}${endpoint}`;
-  console.log('API Request URL:', fullUrl);
-  return fullUrl;
+  if (typeof API_CONFIG !== 'undefined') {
+    const fullUrl = `${API_CONFIG.baseURL}${endpoint}`;
+    console.log('API Request URL:', fullUrl);
+    return fullUrl;
+  } else {
+    // Fallback if API_CONFIG is not loaded yet
+    const baseURL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:4444' 
+      : 'https://growth-tech.com.ua';
+    const fullUrl = `${baseURL}${endpoint}`;
+    console.log('API Request URL (fallback):', fullUrl);
+    return fullUrl;
+  }
 }
 
 // Template configurations based on new specifications
@@ -122,10 +132,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up template selection will be called after loading order
   
   // Set up password form
+  console.log('Setting up password form...');
   const passwordForm = document.getElementById('passwordForm');
+  console.log('Password form element:', passwordForm);
   if (passwordForm) {
     passwordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      console.log('Password form submitted');
       
       const formData = new FormData(e.target);
       const currentPassword = formData.get('currentPassword');
@@ -134,7 +147,12 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Validate passwords match
       if (newPassword !== confirmPassword) {
-        showAlert('Нові паролі не співпадають', 'error');
+        console.log('Passwords do not match');
+        if (typeof showAlert === 'function') {
+          showAlert('Нові паролі не співпадають', 'error');
+        } else {
+          alert('Нові паролі не співпадають');
+        }
         return;
       }
       
@@ -155,16 +173,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const result = await response.json();
         
         if (response.ok) {
-          showAlert('Пароль успішно змінено!', 'success');
+          console.log('Password changed successfully');
+          if (typeof showAlert === 'function') {
+            showAlert('Пароль успішно змінено!', 'success');
+          } else {
+            alert('Пароль успішно змінено!');
+          }
           closePasswordModal();
         } else {
-          showAlert(result.error || 'Помилка при зміні пароля', 'error');
+          console.log('Password change failed:', result);
+          if (typeof showAlert === 'function') {
+            showAlert(result.error || 'Помилка при зміні пароля', 'error');
+          } else {
+            alert(result.error || 'Помилка при зміні пароля');
+          }
         }
       } catch (error) {
         console.error('Password change error:', error);
-        showAlert('Помилка при зміні пароля. Спробуйте пізніше.', 'error');
+        if (typeof showAlert === 'function') {
+          showAlert('Помилка при зміні пароля. Спробуйте пізніше.', 'error');
+        } else {
+          alert('Помилка при зміні пароля. Спробуйте пізніше.');
+        }
       }
     });
+  } else {
+    console.error('Password form not found in DOM');
   }
 });
 
