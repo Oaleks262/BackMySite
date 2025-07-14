@@ -201,7 +201,9 @@ window.onclick = function(event) {
 }
 
 // Form submissions
-document.getElementById('orderForm').addEventListener('submit', async (e) => {
+const orderForm = document.getElementById('orderForm');
+if (orderForm) {
+  orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   
   const formData = new FormData(e.target);
@@ -774,4 +776,55 @@ async function handlePaymentClick(event) {
   } catch (error) {
     showAlert(`Помилка платежу: ${error.message}`, 'error');
   }
+});
+} else {
+  console.log('Order form not found');
 }
+
+// Password change functionality (shared between admin and dashboard)
+function openPasswordModal() {
+  console.log('openPasswordModal called');
+  const modal = document.getElementById('passwordModal');
+  console.log('Modal element:', modal);
+  
+  if (modal) {
+    console.log('Modal found, showing...');
+    modal.style.display = 'block';
+    modal.style.zIndex = '1001';
+    modal.classList.add('show');
+    console.log('Password modal opened, display:', modal.style.display);
+    
+    // Clear form
+    const form = document.getElementById('passwordForm');
+    if (form) {
+      form.reset();
+    }
+    
+    // Focus on first input field
+    const firstInput = modal.querySelector('input');
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 100);
+    }
+  } else {
+    console.error('Password modal not found in DOM');
+    console.log('Available modals:', document.querySelectorAll('.modal'));
+  }
+}
+
+function closePasswordModal() {
+  console.log('closePasswordModal called');
+  const modal = document.getElementById('passwordModal');
+  const form = document.getElementById('passwordForm');
+  
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+  }
+  if (form) {
+    form.reset();
+  }
+}
+
+// Make password functions globally available
+window.openPasswordModal = openPasswordModal;
+window.closePasswordModal = closePasswordModal;

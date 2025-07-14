@@ -2,32 +2,6 @@
 let allOrders = [];
 let currentOrderId = null;
 
-// API Configuration
-const API_CONFIG = {
-  baseURL: window.location.hostname === 'localhost' 
-    ? 'http://localhost:4444' 
-    : 'https://growth-tech.com.ua',
-  
-  endpoints: {
-    auth: '/api/auth',
-    orders: '/api/orders',
-    contact: '/api/contact',
-    payment: '/api/payment',
-    upload: '/api/upload',
-    templates: '/api/templates',
-    profile: '/api/profile',
-    website: '/api/website',
-    admin: '/api/admin'
-  }
-};
-
-// Helper function to get full API URL
-function getAPIUrl(endpoint) {
-  const fullUrl = `${API_CONFIG.baseURL}${endpoint}`;
-  console.log('API Request URL:', fullUrl);
-  return fullUrl;
-}
-
 // Check if user is admin
 document.addEventListener('DOMContentLoaded', function() {
   const user = JSON.parse(localStorage.getItem('user'));
@@ -130,54 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-
-// Password change functionality
-function openPasswordModal() {
-  console.log('openPasswordModal called');
-  const modal = document.getElementById('passwordModal');
-  console.log('Modal element:', modal);
-  
-  if (modal) {
-    console.log('Modal found, showing...');
-    modal.style.display = 'block';
-    modal.style.zIndex = '1001';
-    modal.classList.add('show');
-    console.log('Password modal opened, display:', modal.style.display);
-    
-    // Clear form
-    const form = document.getElementById('passwordForm');
-    if (form) {
-      form.reset();
-    }
-    
-    // Focus on first input field
-    const firstInput = modal.querySelector('input');
-    if (firstInput) {
-      setTimeout(() => firstInput.focus(), 100);
-    }
-  } else {
-    console.error('Password modal not found in DOM');
-    console.log('Available modals:', document.querySelectorAll('.modal'));
-  }
-}
-
-function closePasswordModal() {
-  console.log('closePasswordModal called');
-  const modal = document.getElementById('passwordModal');
-  const form = document.getElementById('passwordForm');
-  
-  if (modal) {
-    modal.style.display = 'none';
-    modal.classList.remove('show');
-  }
-  if (form) {
-    form.reset();
-  }
-}
-
-// Make functions globally available
-window.openPasswordModal = openPasswordModal;
-window.closePasswordModal = closePasswordModal;
 
 // Test function for debugging
 window.testPasswordModal = function() {
