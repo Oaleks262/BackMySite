@@ -513,19 +513,58 @@ async function confirmOrder(orderId) {
   
   try {
     const token = localStorage.getItem('token');
-    const url = getAPIUrl(`/api/orders/confirm/${orderId}`);
+    let url, method, body;
+    
+    // Try different approaches based on what might work
+    // First try the original PUT method
+    url = getAPIUrl(`/api/orders/confirm/${orderId}`);
+    method = 'PUT';
+    body = null;
+    
+    console.log('Trying PUT method first...');
     console.log('Request URL:', url);
     
-    const response = await fetch(url, {
-      method: 'PUT',
+    let response = await fetch(url, {
+      method: method,
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: body
     });
     
     console.log('Response status:', response.status);
-    console.log('Response headers:', response.headers);
+    
+    // If PUT fails with 500, try PATCH method
+    if (response.status === 500) {
+      console.log('PUT failed, trying PATCH method...');
+      method = 'PATCH';
+      response = await fetch(url, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ confirmed: true })
+      });
+      console.log('PATCH response status:', response.status);
+    }
+    
+    // If both fail, try POST to update endpoint
+    if (response.status === 500) {
+      console.log('PATCH failed, trying POST to update endpoint...');
+      url = getAPIUrl(`/api/orders/update/${orderId}`);
+      method = 'POST';
+      response = await fetch(url, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ confirmed: true })
+      });
+      console.log('POST update response status:', response.status);
+    }
     
     if (response.ok) {
       const result = await response.json();
