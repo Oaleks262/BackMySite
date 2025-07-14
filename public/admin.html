@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Адмін панель - Growth-tech | Панель адміністратора</title>
+    <meta name="description" content="Панель адміністратора Growth-tech. Керування замовленнями, користувачами та системою.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <title>Адмін панель - Growth-tech</title>
 </head>
 <body class="card">
 <header class="header">
@@ -28,7 +42,7 @@
       </a>
       <nav class="header__content__nav">
         <ul class="header__content__ul" style="justify-content: flex-end;">
-          <li class="header__content__li"><a href="#" id="passwordChangeBtn">
+          <li class="header__content__li"><a href="#" id="passwordChangeBtn" onclick="openPasswordModal(); return false;">
             Змінити пароль
           </a></li>
           <li class="header__content__li"><a href="#" id="userNameDisplay">
@@ -71,7 +85,7 @@
         <li class="header__mob__menu__list__li"><a href="/">Головна</a></li>
         <li class="header__mob__menu__list__li"><a href="/#cont">Про нас</a></li>
         <li class="header__mob__menu__list__li"><a href="/#price">Ціна</a></li>
-        <li class="header__mob__menu__list__li"><a href="#" id="passwordChangeBtnMob">Змінити пароль</a></li>
+        <li class="header__mob__menu__list__li"><a href="#" id="passwordChangeBtnMob" onclick="openPasswordModal(); return false;">Змінити пароль</a></li>
         <li class="header__mob__menu__list__li"><a href="#" id="userNameDisplayMob">Адміністратор</a></li>
         <li class="header__mob__menu__list__li" style="margin-top: 44px;">
           <button style="box-shadow: 0px 1px 4px 0px var(--color-muted);" id="themeToggleMob"><span id="iconMob">🌙</span></button>

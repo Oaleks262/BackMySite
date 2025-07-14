@@ -66,16 +66,22 @@ document.addEventListener('DOMContentLoaded', function() {
   if (passwordBtn) {
     passwordBtn.addEventListener('click', function(e) {
       e.preventDefault();
+      console.log('Password change button clicked');
       openPasswordModal();
     });
+  } else {
+    console.error('Password change button not found');
   }
   
   const passwordBtnMob = document.getElementById('passwordChangeBtnMob');
   if (passwordBtnMob) {
     passwordBtnMob.addEventListener('click', function(e) {
       e.preventDefault();
+      console.log('Mobile password change button clicked');
       openPasswordModal();
     });
+  } else {
+    console.error('Mobile password change button not found');
   }
   
   // Set up password form
@@ -129,11 +135,29 @@ document.addEventListener('DOMContentLoaded', function() {
 function openPasswordModal() {
   console.log('openPasswordModal called');
   const modal = document.getElementById('passwordModal');
+  console.log('Modal element:', modal);
+  
   if (modal) {
+    console.log('Modal found, showing...');
     modal.style.display = 'block';
-    console.log('Password modal opened');
+    modal.style.zIndex = '1001';
+    modal.classList.add('show');
+    console.log('Password modal opened, display:', modal.style.display);
+    
+    // Clear form
+    const form = document.getElementById('passwordForm');
+    if (form) {
+      form.reset();
+    }
+    
+    // Focus on first input field
+    const firstInput = modal.querySelector('input');
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 100);
+    }
   } else {
-    console.error('Password modal not found');
+    console.error('Password modal not found in DOM');
+    console.log('Available modals:', document.querySelectorAll('.modal'));
   }
 }
 
@@ -144,6 +168,7 @@ function closePasswordModal() {
   
   if (modal) {
     modal.style.display = 'none';
+    modal.classList.remove('show');
   }
   if (form) {
     form.reset();
@@ -153,6 +178,17 @@ function closePasswordModal() {
 // Make functions globally available
 window.openPasswordModal = openPasswordModal;
 window.closePasswordModal = closePasswordModal;
+
+// Test function for debugging
+window.testPasswordModal = function() {
+  console.log('Testing password modal...');
+  const modal = document.getElementById('passwordModal');
+  console.log('Modal element found:', !!modal);
+  if (modal) {
+    console.log('Modal HTML:', modal.outerHTML.substring(0, 200) + '...');
+  }
+  openPasswordModal();
+};
 
 // Close password modal when clicking outside
 window.addEventListener('click', function(event) {
@@ -548,10 +584,135 @@ function logout() {
   window.location.href = '/';
 }
 
+// Popup Modal System
+let popupCallback = null;
+let popupInputCallback = null;
+
+function showPopup(type, title, message, options = {}) {
+  const modal = document.getElementById('popupModal');
+  const icon = document.getElementById('popupIcon');
+  const titleEl = document.getElementById('popupTitle');
+  const messageEl = document.getElementById('popupMessage');
+  const inputContainer = document.getElementById('popupInput');
+  const inputField = document.getElementById('popupInputField');
+  const cancelBtn = document.getElementById('popupCancelBtn');
+  const confirmBtn = document.getElementById('popupConfirmBtn');
+  
+  // Set icon based on type
+  icon.className = `popup-icon ${type}`;
+  switch(type) {
+    case 'success':
+      icon.innerHTML = '✓';
+      break;
+    case 'error':
+      icon.innerHTML = '✕';
+      break;
+    case 'warning':
+      icon.innerHTML = '⚠';
+      break;
+    case 'info':
+      icon.innerHTML = 'i';
+      break;
+    case 'question':
+      icon.innerHTML = '?';
+      break;
+    default:
+      icon.innerHTML = 'i';
+  }
+  
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  
+  // Configure buttons
+  if (options.showCancel !== false) {
+    cancelBtn.style.display = 'block';
+    cancelBtn.textContent = options.cancelText || 'Скасувати';
+  } else {
+    cancelBtn.style.display = 'none';
+  }
+  
+  confirmBtn.textContent = options.confirmText || 'OK';
+  
+  // Handle input field
+  if (options.showInput) {
+    inputContainer.style.display = 'block';
+    inputField.placeholder = options.inputPlaceholder || '';
+    inputField.value = options.inputValue || '';
+    inputField.focus();
+  } else {
+    inputContainer.style.display = 'none';
+  }
+  
+  // Store callback
+  popupCallback = options.callback;
+  popupInputCallback = options.inputCallback;
+  
+  modal.style.display = 'block';
+  
+  // Focus confirm button if no input
+  if (!options.showInput) {
+    confirmBtn.focus();
+  }
+}
+
+function closePopup() {
+  const modal = document.getElementById('popupModal');
+  modal.style.display = 'none';
+  popupCallback = null;
+  popupInputCallback = null;
+}
+
+function confirmPopup() {
+  const inputField = document.getElementById('popupInputField');
+  const inputContainer = document.getElementById('popupInput');
+  
+  if (inputContainer.style.display !== 'none' && popupInputCallback) {
+    popupInputCallback(inputField.value);
+  } else if (popupCallback) {
+    popupCallback(true);
+  }
+  
+  closePopup();
+}
+
+// Custom alert function
+function showAlert(message, type = 'info', title = 'Повідомлення') {
+  return new Promise((resolve) => {
+    showPopup(type, title, message, {
+      showCancel: false,
+      callback: resolve
+    });
+  });
+}
+
+// Custom confirm function
+function showConfirm(message, title = 'Підтвердження') {
+  return new Promise((resolve) => {
+    showPopup('question', title, message, {
+      showCancel: true,
+      confirmText: 'Так',
+      cancelText: 'Ні',
+      callback: resolve
+    });
+  });
+}
+
+// Make functions globally available
+window.showPopup = showPopup;
+window.closePopup = closePopup;
+window.confirmPopup = confirmPopup;
+window.showAlert = showAlert;
+window.showConfirm = showConfirm;
+
 // Close modal when clicking outside
 window.onclick = function(event) {
   const modal = document.getElementById('orderDetailsModal');
   if (event.target === modal) {
     closeOrderDetails();
+  }
+  
+  const popupModal = document.getElementById('popupModal');
+  if (event.target === popupModal) {
+    closePopup();
   }
 }
