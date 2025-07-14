@@ -157,7 +157,7 @@ const confirmOrder = async (req, res) => {
   const { orderId } = req.params;
   
   console.log('confirmOrder викликано для orderId:', orderId);
-  console.log('User від auth middleware:', req.user);
+  console.log('User від auth middleware:', req.user || 'No user (test route)');
 
   try {
     const order = await Order.findById(orderId).populate('user');

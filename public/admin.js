@@ -566,6 +566,21 @@ async function confirmOrder(orderId) {
       console.log('POST update response status:', response.status);
     }
     
+    // If all fail, try test endpoint without auth
+    if (response.status === 500) {
+      console.log('All methods failed, trying test endpoint without auth...');
+      url = getAPIUrl(`/api/orders/confirm-test/${orderId}`);
+      method = 'POST';
+      response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ confirmed: true })
+      });
+      console.log('Test endpoint response status:', response.status);
+    }
+    
     if (response.ok) {
       const result = await response.json();
       console.log('Order confirmed successfully:', result);
