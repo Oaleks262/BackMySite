@@ -209,6 +209,9 @@ window.testPasswordModal = function() {
   openPasswordModal();
 };
 
+// Make confirmOrder globally available
+window.confirmOrder = confirmOrder;
+
 // Close password modal when clicking outside
 window.addEventListener('click', function(event) {
   const passwordModal = document.getElementById('passwordModal');
@@ -492,29 +495,59 @@ function getSectionName(section) {
 
 // Confirm order
 async function confirmOrder(orderId) {
+  console.log('confirmOrder called with orderId:', orderId);
+  
+  // Check if user is admin
+  const user = JSON.parse(localStorage.getItem('user'));
+  const token = localStorage.getItem('token');
+  
+  if (!user || !token || user.role !== 'admin') {
+    showAlert('Доступ заборонено. Тільки адміністратори можуть підтверджувати замовлення.', 'error', 'Помилка');
+    return;
+  }
+  
   const confirmed = await showConfirm('Підтвердити це замовлення?', 'Підтвердження замовлення');
   if (!confirmed) return;
   
+  console.log('Confirming order:', orderId);
+  
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(getAPIUrl(`/api/orders/confirm/${orderId}`), {
+    const url = getAPIUrl(`/api/orders/confirm/${orderId}`);
+    console.log('Request URL:', url);
+    
+    const response = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     });
     
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+    
     if (response.ok) {
+      const result = await response.json();
+      console.log('Order confirmed successfully:', result);
       showAlert('Замовлення підтверджено!', 'success', 'Успіх');
       closeOrderDetails();
       loadOrders();
     } else {
-      const result = await response.json();
-      showAlert('Помилка: ' + result.error, 'error', 'Помилка');
+      let errorMessage = 'Невідома помилка сервера';
+      try {
+        const result = await response.json();
+        console.log('Error response:', result);
+        errorMessage = result.error || result.message || errorMessage;
+      } catch (jsonError) {
+        console.error('Failed to parse error response:', jsonError);
+        errorMessage = `Помилка сервера (${response.status}): ${response.statusText}`;
+      }
+      showAlert('Помилка: ' + errorMessage, 'error', 'Помилка');
     }
   } catch (error) {
     console.error('Error confirming order:', error);
-    showAlert('Помилка при підтвердженні замовлення', 'error', 'Помилка');
+    showAlert('Помилка при підтвердженні замовлення: ' + error.message, 'error', 'Помилка');
   }
 }
 
