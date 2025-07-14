@@ -2,6 +2,23 @@
 let allOrders = [];
 let currentOrderId = null;
 
+// Helper function to get full API URL (using global API_CONFIG from script.js)
+function getAPIUrl(endpoint) {
+  if (typeof API_CONFIG !== 'undefined') {
+    const fullUrl = `${API_CONFIG.baseURL}${endpoint}`;
+    console.log('API Request URL:', fullUrl);
+    return fullUrl;
+  } else {
+    // Fallback if API_CONFIG is not loaded yet
+    const baseURL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:4444' 
+      : 'https://growth-tech.com.ua';
+    const fullUrl = `${baseURL}${endpoint}`;
+    console.log('API Request URL (fallback):', fullUrl);
+    return fullUrl;
+  }
+}
+
 // Password change functionality for admin page
 function openPasswordModal() {
   console.log('openPasswordModal called');
@@ -52,14 +69,26 @@ window.closePasswordModal = closePasswordModal;
 
 // Check if user is admin
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('Admin DOMContentLoaded event fired');
+  
   const user = JSON.parse(localStorage.getItem('user'));
   const token = localStorage.getItem('token');
   
+  console.log('User:', user);
+  console.log('Token:', !!token);
+  
   if (!user || !token || user.role !== 'admin') {
-    showAlert('Доступ заборонено. Тільки для адміністраторів.', 'error', 'Доступ заборонено');
+    console.log('Access denied - redirecting');
+    if (typeof showAlert === 'function') {
+      showAlert('Доступ заборонено. Тільки для адміністраторів.', 'error', 'Доступ заборонено');
+    } else {
+      alert('Доступ заборонено. Тільки для адміністраторів.');
+    }
     window.location.href = '/';
     return;
   }
+  
+  console.log('Admin access granted, initializing...');
   
   // Update user display
   document.getElementById('userNameDisplay').textContent = `${user.firstName} ${user.lastName} (Адмін)`;
@@ -77,11 +106,27 @@ document.addEventListener('DOMContentLoaded', function() {
   setTheme(saved);
   
   // Load orders
-  loadOrders();
+  try {
+    loadOrders();
+  } catch (error) {
+    console.error('Error loading orders:', error);
+  }
   
   // Set up event listeners
-  document.getElementById('refreshBtn').addEventListener('click', loadOrders);
-  document.getElementById('statusFilter').addEventListener('change', filterOrders);
+  console.log('Setting up event listeners...');
+  
+  const refreshBtn = document.getElementById('refreshBtn');
+  const statusFilter = document.getElementById('statusFilter');
+  
+  console.log('refreshBtn:', refreshBtn);
+  console.log('statusFilter:', statusFilter);
+  
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', loadOrders);
+  }
+  if (statusFilter) {
+    statusFilter.addEventListener('change', filterOrders);
+  }
   
   // Set up password change button listeners
   const passwordBtn = document.getElementById('passwordChangeBtn');
