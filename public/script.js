@@ -825,6 +825,10 @@ function closePasswordModal() {
   }
 }
 
-// Make password functions globally available
+// Make modal functions globally available
 window.openPasswordModal = openPasswordModal;
 window.closePasswordModal = closePasswordModal;
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.openContactModal = openContactModal;
+window.closeContactModal = closeContactModal;
