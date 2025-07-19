@@ -351,6 +351,14 @@ function viewOrder(orderId) {
           <span>${order.confirmed ? 'Так' : 'Ні'}</span>
         </div>
         <div class="detail-item">
+          <label>Ціна</label>
+          <span>${order.amount ? order.amount.toLocaleString('uk-UA') + ' грн' : 'Не встановлено'}</span>
+        </div>
+        <div class="detail-item">
+          <label>Тариф</label>
+          <span>${order.tariffType || 'Не обрано'}</span>
+        </div>
+        <div class="detail-item">
           <label>PDF</label>
           <span>${order.pdfUrl ? `<a href="${order.pdfUrl}" target="_blank">Завантажити</a>` : 'Не створено'}</span>
         </div>
@@ -365,10 +373,29 @@ function viewOrder(orderId) {
   
   // Update action buttons
   const confirmBtn = document.getElementById('confirmOrderBtn');
+  const priceSection = document.getElementById('priceInputSection');
+  const priceInput = document.getElementById('orderPrice');
+  
   if (order.confirmed) {
     confirmBtn.style.display = 'none';
+    priceSection.style.display = 'none';
   } else {
     confirmBtn.style.display = 'block';
+    priceSection.style.display = 'block';
+    
+    // Встановлюємо поточну ціну якщо вона є
+    if (order.amount) {
+      priceInput.value = order.amount;
+    } else {
+      // Встановлюємо стандартну ціну за тариф
+      const defaultPrices = {
+        'single': 5000,
+        'landing': 8000,
+        'blog': 12000
+      };
+      priceInput.value = defaultPrices[order.tariffType] || 5000;
+    }
+    
     confirmBtn.onclick = () => confirmOrder(orderId);
   }
 }
@@ -506,7 +533,19 @@ async function confirmOrder(orderId) {
     return;
   }
   
-  const confirmed = await showConfirm('Підтвердити це замовлення?', 'Підтвердження замовлення');
+  // Отримуємо ціну з поля введення
+  const priceInput = document.getElementById('orderPrice');
+  const customPrice = parseInt(priceInput.value);
+  
+  if (!customPrice || customPrice <= 0) {
+    showAlert('Будь ласка, введіть коректну ціну для замовлення.', 'error', 'Помилка');
+    return;
+  }
+  
+  const confirmed = await showConfirm(
+    `Підтвердити це замовлення з ціною ${customPrice.toLocaleString('uk-UA')} грн?`, 
+    'Підтвердження замовлення'
+  );
   if (!confirmed) return;
   
   console.log('Confirming order:', orderId);
@@ -516,10 +555,10 @@ async function confirmOrder(orderId) {
     let url, method, body;
     
     // Try different approaches based on what might work
-    // First try the original PUT method
+    // First try the original PUT method with price
     url = getAPIUrl(`/api/orders/confirm/${orderId}`);
     method = 'PUT';
-    body = null;
+    body = JSON.stringify({ amount: customPrice });
     
     console.log('Trying PUT method first...');
     console.log('Request URL:', url);

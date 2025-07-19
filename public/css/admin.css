@@ -577,3 +577,41 @@
     max-width: 900px;
   }
 }
+
+/* Price input section */
+.price-input-section {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.price-input-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #343a40;
+}
+
+.price-input-section input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.price-input-section input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.price-input-section small {
+  display: block;
+  margin-top: 8px;
+  color: #6c757d;
+  font-size: 14px;
+}

@@ -166,6 +166,11 @@
       <!-- Order details will be loaded here -->
     </div>
     <div class="modal-actions">
+      <div class="price-input-section" id="priceInputSection" style="display: none;">
+        <label for="orderPrice">Ціна проекту (грн):</label>
+        <input type="number" id="orderPrice" placeholder="Введіть ціну в гривнях" min="0" step="100">
+        <small>Ця ціна буде використана в договорі замість стандартної ціни за тариф</small>
+      </div>
       <button id="confirmOrderBtn" class="action-btn confirm">Підтвердити замовлення</button>
       <button id="deleteOrderBtn" class="action-btn delete">Видалити замовлення</button>
     </div>

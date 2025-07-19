@@ -155,13 +155,20 @@ const getMyOrder = async (req, res) => {
 
 const confirmOrder = async (req, res) => {
   const { orderId } = req.params;
+  const { amount } = req.body; // Отримуємо ціну з тіла запиту
   
   console.log('confirmOrder викликано для orderId:', orderId);
+  console.log('Custom amount:', amount);
   console.log('User від auth middleware:', req.user || 'No user (test route)');
 
   try {
     const order = await Order.findById(orderId).populate('user');
     if (!order) return res.status(404).json({ error: 'Замовлення не знайдено' });
+
+    // Встановлюємо кастомну ціну якщо вона передана
+    if (amount && amount > 0) {
+      order.amount = amount;
+    }
 
     const pdfPath = await generatePDF(order);
     const pdfUrl = `/pdfs/${path.basename(pdfPath)}`;
