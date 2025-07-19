@@ -803,12 +803,62 @@ function showConfirm(message, title = 'Підтвердження') {
   });
 }
 
+// Delete order function
+async function deleteOrder(orderId) {
+  const confirmed = await showConfirm(
+    'Ви впевнені, що хочете видалити це замовлення? Цю дію не можна буде скасувати.',
+    'Видалення замовлення'
+  );
+  
+  if (!confirmed) return;
+  
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl(`/api/admin/orders/${orderId}`), {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      await showAlert('Замовлення успішно видалено', 'success');
+      // Оновлюємо список замовлень
+      await loadOrders();
+      // Закриваємо модальне вікно якщо воно відкрите
+      closeOrderDetails();
+    } else {
+      const error = await response.json();
+      await showAlert(`Помилка видалення: ${error.error}`, 'error');
+    }
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    await showAlert('Помилка видалення замовлення', 'error');
+  }
+}
+
+// Add event listener for delete button
+document.addEventListener('DOMContentLoaded', function() {
+  // Existing event listeners...
+  
+  // Delete order button handler
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'deleteOrderBtn') {
+      if (currentOrderId) {
+        deleteOrder(currentOrderId);
+      }
+    }
+  });
+});
+
 // Make functions globally available
 window.showPopup = showPopup;
 window.closePopup = closePopup;
 window.confirmPopup = confirmPopup;
 window.showAlert = showAlert;
 window.showConfirm = showConfirm;
+window.deleteOrder = deleteOrder;
 
 // Close modal when clicking outside
 window.onclick = function(event) {
