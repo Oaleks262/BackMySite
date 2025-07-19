@@ -16,6 +16,17 @@ const orderSchema = new mongoose.Schema({
   blocks: { type: Object, default: {} },
   confirmed: { type: Boolean, default: false },
   pdfUrl: String,
+  contractVersion: { type: Number, default: 1 },
+  executorSignature: {
+    name: String,
+    date: Date,
+    ip: String
+  },
+  clientSignature: {
+    name: String,
+    date: Date,
+    ip: String
+  },
   paymentIntentId: String,
   amount: Number,
   paidAt: Date,

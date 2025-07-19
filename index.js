@@ -12,6 +12,7 @@ const templateRoutes = require('./routes/templates');
 const profileRoutes = require('./routes/profile');
 const websiteRoutes = require('./routes/website');
 const adminRoutes = require('./routes/admin');
+const signatureRoutes = require('./routes/signature');
 
 // Load environment variables
 const envResult = dotenv.config();
@@ -78,6 +79,7 @@ app.use('/api/templates', templateRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/website', websiteRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/signature', signatureRoutes);
 app.use('/generated-websites', express.static(path.join(__dirname, 'generated-websites')));
 
 // Catch-all handler: serve index.html for all other routes (SPA fallback)
