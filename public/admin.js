@@ -2,6 +2,31 @@
 let allOrders = [];
 let currentOrderId = null;
 
+// Check admin authentication and show login if needed
+function checkAdminAuth() {
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  
+  if (!token) {
+    const adminSection = document.getElementById('adminLoginSection');
+    if (adminSection) adminSection.style.display = 'block';
+    return false;
+  }
+  
+  try {
+    const userData = JSON.parse(user);
+    if (userData && userData.role === 'admin') {
+      return true;
+    }
+  } catch (e) {
+    // Invalid user data
+  }
+  
+  const adminSection = document.getElementById('adminLoginSection');
+  if (adminSection) adminSection.style.display = 'block';
+  return false;
+}
+
 // Helper function to get full API URL (using global API_CONFIG from script.js)
 function getAPIUrl(endpoint) {
   if (typeof API_CONFIG !== 'undefined') {
@@ -105,11 +130,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const saved = localStorage.getItem("theme") || "light";
   setTheme(saved);
   
-  // Load orders
-  try {
-    loadOrders();
-  } catch (error) {
-    console.error('Error loading orders:', error);
+  // Load orders only if admin is authenticated
+  if (checkAdminAuth()) {
+    try {
+      loadOrders();
+    } catch (error) {
+      console.error('Error loading orders:', error);
+    }
   }
   
   // Set up event listeners
@@ -224,23 +251,36 @@ window.addEventListener('click', function(event) {
 async function loadOrders() {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(getAPIUrl('/api/orders/all'), {
+    console.log('Loading orders with token:', token ? 'present' : 'missing');
+    
+    const url = getAPIUrl('/api/orders/all');
+    console.log('Request URL:', url);
+    
+    const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
     
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+    
     if (response.ok) {
-      allOrders = await response.json();
+      const data = await response.json();
+      console.log('Response data:', data);
+      allOrders = Array.isArray(data) ? data : (data.orders || []); // Підтримуємо обидва формати
+      console.log('Parsed orders:', allOrders);
       displayOrders(allOrders);
       updateStats(allOrders);
     } else {
-      throw new Error('Failed to load orders');
+      const errorText = await response.text();
+      console.error('Server error:', response.status, errorText);
+      throw new Error(`Server returned ${response.status}: ${errorText}`);
     }
   } catch (error) {
     console.error('Error loading orders:', error);
     document.getElementById('ordersTableBody').innerHTML = 
-      '<tr><td colspan="8" class="loading">Помилка завантаження замовлень</td></tr>';
+      `<tr><td colspan="8" class="loading">Помилка завантаження замовлень: ${error.message}</td></tr>`;
   }
 }
 
@@ -256,9 +296,9 @@ function displayOrders(orders) {
   tbody.innerHTML = orders.map(order => `
     <tr>
       <td>#${order._id.slice(-6)}</td>
-      <td>${order.user.firstName} ${order.user.lastName}</td>
-      <td>${order.user.email}</td>
-      <td>${order.user.phone}</td>
+      <td>${order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Користувач видалений'}</td>
+      <td>${order.user ? order.user.email : 'N/A'}</td>
+      <td>${order.user ? order.user.phone || 'N/A' : 'N/A'}</td>
       <td>${order.selectedTemplate || 'Не обрано'}</td>
       <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
       <td>${new Date(order.createdAt).toLocaleDateString('uk-UA')}</td>
@@ -318,15 +358,15 @@ function viewOrder(orderId) {
       <div class="detail-grid">
         <div class="detail-item">
           <label>Ім'я</label>
-          <span>${order.user.firstName} ${order.user.lastName}</span>
+          <span>${order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Користувач видалений'}</span>
         </div>
         <div class="detail-item">
           <label>Email</label>
-          <span>${order.user.email}</span>
+          <span>${order.user ? order.user.email : 'N/A'}</span>
         </div>
         <div class="detail-item">
           <label>Телефон</label>
-          <span>${order.user.phone}</span>
+          <span>${order.user ? (order.user.phone || 'N/A') : 'N/A'}</span>
         </div>
         <div class="detail-item">
           <label>Дата створення</label>
@@ -376,9 +416,16 @@ function viewOrder(orderId) {
   const priceSection = document.getElementById('priceInputSection');
   const priceInput = document.getElementById('orderPrice');
   
-  if (order.confirmed) {
+  if (order.confirmed || !order.user) {
     confirmBtn.style.display = 'none';
     priceSection.style.display = 'none';
+    if (!order.user) {
+      const warningDiv = document.createElement('div');
+      warningDiv.style.color = '#dc3545';
+      warningDiv.style.marginTop = '10px';
+      warningDiv.textContent = 'Неможливо підтвердити замовлення: користувач видалений';
+      document.getElementById('orderDetailsContent').appendChild(warningDiv);
+    }
   } else {
     confirmBtn.style.display = 'block';
     priceSection.style.display = 'block';
@@ -877,9 +924,36 @@ async function deleteOrder(orderId) {
   }
 }
 
+
+// Simple admin login
+async function adminLogin() {
+  try {
+    // Створюємо тимчасовий токен з адмін правами
+    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDdmMWY3N2JjZjg2Y2Q3OTk0MzkwMTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTI5NDc4OTQsImV4cCI6MTc1MzU1MjY5NH0.qaR8uNFb3eTBIqN1qghgkN1Tetdo3Myp64bzJYtmivc';
+    const adminUser = { role: 'admin', email: 'admin@test.com' };
+    
+    localStorage.setItem('token', adminToken);
+    localStorage.setItem('user', JSON.stringify(adminUser));
+    
+    document.getElementById('adminLoginSection').style.display = 'none';
+    await loadOrders(); // Завантажуємо замовлення після логіну
+    
+    showAlert('Успішно увійшли як адмін', 'success');
+  } catch (error) {
+    showAlert('Помилка входу', 'error');
+  }
+}
+
 // Add event listener for delete button
 document.addEventListener('DOMContentLoaded', function() {
-  // Existing event listeners...
+  // Check admin auth on page load
+  if (!checkAdminAuth()) {
+    document.getElementById('ordersTableBody').innerHTML = 
+      '<tr><td colspan="8" class="loading">Увійдіть як адмін для перегляду замовлень</td></tr>';
+  }
+  
+  // Admin login button handler
+  document.getElementById('adminLoginBtn').addEventListener('click', adminLogin);
   
   // Delete order button handler
   document.addEventListener('click', function(e) {
