@@ -316,7 +316,12 @@ function displayOrders(orders) {
 function getStatusText(status) {
   const statusMap = {
     'draft': 'Чернетка',
+    'pending_payment': 'Очікує оплати',
+    'paid': 'Оплачено',
+    'in_progress': 'В роботі',
     'completed': 'Завершено',
+    'cancelled': 'Скасовано',
+    'payment_failed': 'Помилка оплати',
     'confirmed': 'Підтверджено'
   };
   return statusMap[status] || status;
@@ -384,7 +389,10 @@ function viewOrder(orderId) {
         </div>
         <div class="detail-item">
           <label>Статус</label>
-          <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span>
+          <div class="status-control">
+            <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span>
+            <button class="action-btn change-status" onclick="showStatusChangeModal('${order._id}', '${order.status}')">Змінити статус</button>
+          </div>
         </div>
         <div class="detail-item">
           <label>Підтверджено</label>
@@ -774,6 +782,100 @@ function logout() {
   localStorage.removeItem('user');
   localStorage.removeItem('theme');
   window.location.href = '/';
+}
+
+// Status change functionality
+function showStatusChangeModal(orderId, currentStatus) {
+  const statusOptions = [
+    { value: 'draft', label: 'Чернетка' },
+    { value: 'pending_payment', label: 'Очікує оплати' },
+    { value: 'paid', label: 'Оплачено' },
+    { value: 'in_progress', label: 'В роботі' },
+    { value: 'completed', label: 'Завершено' },
+    { value: 'cancelled', label: 'Скасовано' },
+    { value: 'payment_failed', label: 'Помилка оплати' }
+  ];
+
+  const selectOptions = statusOptions
+    .map(option => `<option value="${option.value}" ${option.value === currentStatus ? 'selected' : ''}>${option.label}</option>`)
+    .join('');
+
+  const modalHtml = `
+    <div class="modal-overlay" onclick="closeStatusModal()">
+      <div class="modal-content status-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Зміна статусу замовлення</h2>
+          <button class="close-btn" onclick="closeStatusModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="statusSelect">Виберіть новий статус:</label>
+            <select id="statusSelect" class="form-control">
+              ${selectOptions}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeStatusModal()">Скасувати</button>
+          <button class="btn btn-primary" onclick="updateOrderStatus('${orderId}')">Змінити статус</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const modalContainer = document.createElement('div');
+  modalContainer.innerHTML = modalHtml;
+  modalContainer.id = 'statusModalContainer';
+  document.body.appendChild(modalContainer);
+}
+
+function closeStatusModal() {
+  const modal = document.getElementById('statusModalContainer');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+async function updateOrderStatus(orderId) {
+  const statusSelect = document.getElementById('statusSelect');
+  const newStatus = statusSelect.value;
+  
+  if (!newStatus) {
+    showAlert('Будь ласка, виберіть статус', 'error', 'Помилка');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl(`/api/orders/${orderId}/status`), {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      showAlert('Статус замовлення успішно оновлено', 'success', 'Успіх');
+      closeStatusModal();
+      
+      // Оновлюємо список замовлень
+      await loadOrders();
+      
+      // Якщо модальне вікно замовлення відкрите, оновлюємо його
+      if (currentOrderId === orderId) {
+        viewOrder(orderId);
+      }
+    } else {
+      const error = await response.text();
+      showAlert(`Помилка оновлення статусу: ${error}`, 'error', 'Помилка');
+    }
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    showAlert(`Помилка з'єднання з сервером', 'error', 'Помилка'`);
+  }
 }
 
 // Popup Modal System

@@ -5,7 +5,8 @@ const {
   updateTemplate,
   getMyOrder,
   confirmOrder,
-  getAllOrders
+  getAllOrders,
+  updateOrderStatus
 } = require('../controllers/orderController');
 const { auth, isAdmin } = require('../middleware/auth');
 
@@ -19,5 +20,6 @@ router.post('/update/:orderId', auth, isAdmin, confirmOrder);
 // Тимчасовий роут для тестування без аутентифікації
 router.post('/confirm-test/:orderId', confirmOrder);
 router.get('/all', auth, isAdmin, getAllOrders);
+router.put('/:orderId/status', auth, isAdmin, updateOrderStatus);
 
 module.exports = router;

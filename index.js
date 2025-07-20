@@ -13,6 +13,7 @@ const profileRoutes = require('./routes/profile');
 const websiteRoutes = require('./routes/website');
 const adminRoutes = require('./routes/admin');
 const signatureRoutes = require('./routes/signature');
+const settingsRoutes = require('./routes/settings');
 
 // Load environment variables
 const envResult = dotenv.config();
@@ -70,6 +71,14 @@ app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+app.get('/settings', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'settings.html'));
+});
+
+app.get('/settings.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'settings.html'));
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
@@ -80,6 +89,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/website', websiteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/signature', signatureRoutes);
+app.use('/api/admin/settings', settingsRoutes);
 app.use('/generated-websites', express.static(path.join(__dirname, 'generated-websites')));
 
 // Catch-all handler: serve index.html for all other routes (SPA fallback)
