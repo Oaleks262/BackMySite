@@ -2,7 +2,7 @@
 const API_CONFIG = {
   baseURL: window.location.hostname === 'localhost' 
     ? 'http://localhost:4444' 
-    : 'https://growth-tech.com.ua',
+    : 'http://localhost:4444', // Тимчасово використовуємо localhost для testing
   
   endpoints: {
     auth: '/api/auth',
