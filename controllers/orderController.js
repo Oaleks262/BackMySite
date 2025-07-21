@@ -9,24 +9,16 @@ const path = require('path');
 const fs = require('fs');
 const paymentConfig = require('../config/payment');
 
-// Функція для генерації email з реквізитами оплати
+// Функція для генерації email з реквізитами оплати (тільки з встановленою ціною)
 const generatePaymentEmailTemplate = (order, user) => {
-  const { pricing, bankDetails, companyInfo, emailSettings } = paymentConfig;
+  const { bankDetails, companyInfo, emailSettings } = paymentConfig;
   
-  const basePrice = pricing.tariffs[order.tariffType] || pricing.tariffs.single;
-  let totalPrice = basePrice;
+  // Використовуємо тільки встановлену адміном ціну
+  const totalPrice = order.amount;
   
-  // Розрахунок додаткових функцій
-  const additionalFeatures = order.blocks?.additionalFeatures || {};
-  
-  let additionalCost = 0;
-  Object.keys(additionalFeatures).forEach(feature => {
-    if (additionalFeatures[feature] && pricing.additionalFeatures[feature]) {
-      additionalCost += pricing.additionalFeatures[feature];
-    }
-  });
-  
-  totalPrice += additionalCost;
+  if (!totalPrice || totalPrice <= 0) {
+    throw new Error('Ціна не встановлена адміністратором');
+  }
   
   const templateNames = {
     'single': 'Односторінковий сайт',
@@ -42,11 +34,14 @@ const generatePaymentEmailTemplate = (order, user) => {
   };
   
   let additionalFeaturesHtml = '';
-  if (additionalCost > 0) {
+  const additionalFeatures = order.blocks?.additionalFeatures || {};
+  const selectedFeatures = Object.keys(additionalFeatures).filter(feature => additionalFeatures[feature]);
+  
+  if (selectedFeatures.length > 0) {
     additionalFeaturesHtml = '<h3>Додаткові функції:</h3><ul>';
-    Object.keys(additionalFeatures).forEach(feature => {
-      if (additionalFeatures[feature] && pricing.additionalFeatures[feature]) {
-        additionalFeaturesHtml += `<li>${featureNames[feature]} - ${pricing.additionalFeatures[feature]} ${bankDetails.currency}</li>`;
+    selectedFeatures.forEach(feature => {
+      if (featureNames[feature]) {
+        additionalFeaturesHtml += `<li>${featureNames[feature]}</li>`;
       }
     });
     additionalFeaturesHtml += '</ul>';
@@ -69,15 +64,6 @@ const generatePaymentEmailTemplate = (order, user) => {
               <td style="padding: 8px 0; font-weight: bold;">Тип сайту:</td>
               <td style="padding: 8px 0;">${templateNames[order.tariffType] || order.tariffType}</td>
             </tr>
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 8px 0; font-weight: bold;">Базова вартість:</td>
-              <td style="padding: 8px 0;">${basePrice} ${bankDetails.currency}</td>
-            </tr>
-            ${additionalCost > 0 ? `
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 8px 0; font-weight: bold;">Додаткові функції:</td>
-              <td style="padding: 8px 0;">${additionalCost} ${bankDetails.currency}</td>
-            </tr>` : ''}
             <tr style="border-bottom: 2px solid #2c3e50;">
               <td style="padding: 8px 0; font-weight: bold; font-size: 18px;">Загальна сума:</td>
               <td style="padding: 8px 0; font-weight: bold; font-size: 18px; color: #e74c3c;">${totalPrice} ${bankDetails.currency}</td>
@@ -236,38 +222,29 @@ const updateTemplate = async (req, res) => {
       console.log('Updated existing order:', order._id);
     }
 
-    // Відправляємо email з реквізитами оплати клієнту
-    try {
-      const paymentEmailContent = generatePaymentEmailTemplate(order, user);
-      await sendEmail(user.email, 'Реквізити для оплати замовлення', paymentEmailContent);
-      console.log('Payment details email sent to client:', user.email);
-    } catch (emailError) {
-      console.error('Payment email sending failed:', emailError);
-    }
-
     // Send notification to admin about template update
     try {
-      await sendEmail(process.env.SMTP_EMAIL, 'Замовлення готове до оплати', `
+      await sendEmail(process.env.SMTP_EMAIL, 'Замовлення готове до розгляду', `
         <h2>Клієнт заповнив всі дані!</h2>
         <p><strong>Клієнт:</strong> ${user.firstName} ${user.lastName}</p>
         <p><strong>Email:</strong> ${user.email}</p>
         <p><strong>Телефон:</strong> ${user.phone}</p>
         <p><strong>ID замовлення:</strong> ${order._id}</p>
         <p><strong>Обраний шаблон:</strong> ${template}</p>
-        <p><strong>Статус:</strong> Очікує оплати</p>
+        <p><strong>Статус:</strong> Чернетка</p>
         <p><strong>Час оновлення:</strong> ${new Date().toLocaleString('uk-UA')}</p>
         <hr>
-        <p>Клієнту відправлено реквізити для оплати. Увійдіть в адмін панель для перегляду деталей.</p>
+        <p>Замовлення готове до розгляду. Увійдіть в адмін панель, ознайомтесь з матеріалами та встановіть ціну. Після встановлення ціни клієнт отримає реквізити для оплати.</p>
       `);
-      console.log('Admin notification sent about payment pending');
+      console.log('Admin notification sent about order ready for review');
     } catch (emailError) {
       console.error('Admin notification sending failed:', emailError);
     }
 
     res.status(200).json({ 
-      message: 'Дані збережено. Перевірте пошту для отримання реквізитів оплати.', 
+      message: 'Дані збережено. Очікуйте на розгляд адміністратора для встановлення ціни.', 
       order,
-      status: 'pending_payment'
+      status: 'draft'
     });
   } catch (error) {
     console.error('Update template error:', error);
@@ -292,21 +269,64 @@ const getMyOrder = async (req, res) => {
   }
 };
 
-const confirmOrder = async (req, res) => {
+// Нова функція для встановлення ціни та відправки реквізитів
+const setPriceAndSendPayment = async (req, res) => {
   const { orderId } = req.params;
-  const { amount } = req.body; // Отримуємо ціну з тіла запиту
+  const { amount } = req.body;
   
-  console.log('confirmOrder викликано для orderId:', orderId);
-  console.log('Custom amount:', amount);
-  console.log('User від auth middleware:', req.user || 'No user (test route)');
+  console.log('setPriceAndSendPayment викликано для orderId:', orderId, 'amount:', amount);
 
   try {
     const order = await Order.findById(orderId).populate('user');
     if (!order) return res.status(404).json({ error: 'Замовлення не знайдено' });
 
-    // Встановлюємо кастомну ціну якщо вона передана
-    if (amount && amount > 0) {
-      order.amount = amount;
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ error: 'Необхідно вказати коректну ціну' });
+    }
+
+    // Встановлюємо ціну та статус
+    order.amount = amount;
+    order.status = 'pending_payment';
+    order.paymentEmailSent = true; // Позначаємо, що email з реквізитами вже відправлено
+    await order.save();
+
+    // Відправляємо email з реквізитами оплати
+    try {
+      const paymentEmailHtml = generatePaymentEmailTemplate(order, order.user);
+      await sendEmail(order.user.email, 'Реквізити для оплати', paymentEmailHtml);
+      console.log('Payment email sent to client:', order.user.email);
+    } catch (emailError) {
+      console.error('Payment email sending failed:', emailError);
+      return res.status(500).json({ error: 'Помилка відправки email з реквізитами' });
+    }
+
+    res.status(200).json({ 
+      message: 'Ціну встановлено, клієнт отримав реквізити для оплати',
+      order: {
+        ...order.toObject(),
+        amount: amount
+      }
+    });
+  } catch (error) {
+    console.error('setPriceAndSendPayment error:', error);
+    res.status(500).json({ 
+      error: 'Помилка встановлення ціни', 
+      details: error.message
+    });
+  }
+};
+
+const confirmOrder = async (req, res) => {
+  const { orderId } = req.params;
+  
+  console.log('confirmOrder викликано для orderId:', orderId);
+
+  try {
+    const order = await Order.findById(orderId).populate('user');
+    if (!order) return res.status(404).json({ error: 'Замовлення не знайдено' });
+
+    if (!order.amount || order.amount <= 0) {
+      return res.status(400).json({ error: 'Спочатку потрібно встановити ціну замовлення' });
     }
 
     const pdfPath = await generatePDF(order);
@@ -377,15 +397,71 @@ const updateOrderStatus = async (req, res) => {
       'payment_failed': 'Помилка оплати. Будь ласка, спробуйте ще раз'
     };
 
+    const statusTranslations = {
+      'draft': 'Чернетка',
+      'in_progress': 'В роботі',
+      'completed': 'Завершено',
+      'cancelled': 'Скасовано',
+      'pending_payment': 'Очікує оплати',
+      'paid': 'Оплачено',
+      'payment_failed': 'Помилка оплати'
+    };
+
     try {
-      await sendEmail(order.user.email, 'Оновлення статусу замовлення', `
+      let emailContent = `
         <h2>Статус вашого замовлення змінено</h2>
         <p><strong>ID замовлення:</strong> ${order._id}</p>
-        <p><strong>Новий статус:</strong> ${status}</p>
+        <p><strong>Новий статус:</strong> ${statusTranslations[status] || status}</p>
         <p>${statusMessages[status]}</p>
         <hr>
         <p>Увійдіть у свій кабінет для перегляду деталей.</p>
-      `);
+      `;
+
+      // Якщо статус "pending_payment" і реквізити ще не відправлені
+      if (status === 'pending_payment' && !order.paymentEmailSent && order.amount) {
+        try {
+          const paymentEmailHtml = generatePaymentEmailTemplate(order, order.user);
+          await sendEmail(order.user.email, 'Реквізити для оплати', paymentEmailHtml);
+          
+          // Позначаємо, що email з реквізитами відправлено
+          order.paymentEmailSent = true;
+          await order.save();
+          
+          console.log('Payment email sent to client via status update:', order.user.email);
+          return res.status(200).json({ 
+            message: 'Статус оновлено та відправлено реквізити для оплати',
+            order: {
+              ...order.toObject(),
+              oldStatus,
+              newStatus: status
+            }
+          });
+        } catch (emailError) {
+          console.error('Payment email sending failed:', emailError);
+          // Продовжуємо з звичайним сповіщенням про зміну статусу
+        }
+      }
+
+      // Якщо статус "completed", додаємо посилання на відгук
+      if (status === 'completed') {
+        const reviewUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/review/${order._id}`;
+        emailContent += `
+          <div style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; margin-top: 20px;">
+            <h3 style="color: #27ae60; margin-top: 0;">🌟 Залиште відгук про нашу роботу!</h3>
+            <p>Ваше замовлення завершено! Ми будемо дуже вдячні, якщо ви залишите відгук про якість нашої роботи.</p>
+            <p style="text-align: center; margin-top: 20px;">
+              <a href="${reviewUrl}" style="background-color: #27ae60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                Залишити відгук
+              </a>
+            </p>
+            <p style="font-size: 12px; color: #666; margin-top: 15px;">
+              Ваш відгук допоможе іншим клієнтам довіритися нам та покращить якість наших послуг.
+            </p>
+          </div>
+        `;
+      }
+
+      await sendEmail(order.user.email, 'Оновлення статусу замовлення', emailContent);
       console.log('Status update notification sent to client');
     } catch (emailError) {
       console.error('Status update notification failed:', emailError);
@@ -405,4 +481,4 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, updateTemplate, getMyOrder, confirmOrder, getAllOrders, updateOrderStatus };
+module.exports = { createOrder, updateTemplate, getMyOrder, confirmOrder, getAllOrders, updateOrderStatus, setPriceAndSendPayment };

@@ -30,6 +30,7 @@ const orderSchema = new mongoose.Schema({
   paymentIntentId: String,
   amount: Number,
   paidAt: Date,
+  paymentEmailSent: { type: Boolean, default: false },
   websiteUrl: String,
   uploadedFiles: [{ 
     url: String, 

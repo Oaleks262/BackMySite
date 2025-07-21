@@ -133,6 +133,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Load orders only if admin is authenticated
   if (checkAdminAuth()) {
     try {
+      // Initialize tabs
+      initTabs();
       loadOrders();
     } catch (error) {
       console.error('Error loading orders:', error);
@@ -151,6 +153,12 @@ document.addEventListener('DOMContentLoaded', function() {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', loadOrders);
   }
+  
+  const refreshReviewsBtn = document.getElementById('refreshReviewsBtn');
+  if (refreshReviewsBtn) {
+    refreshReviewsBtn.addEventListener('click', loadReviews);
+  }
+  
   if (statusFilter) {
     statusFilter.addEventListener('change', filterOrders);
   }
@@ -290,6 +298,7 @@ function displayOrders(orders) {
   
   if (orders.length === 0) {
     tbody.innerHTML = '<tr><td colspan="8" class="loading">Немає замовлень</td></tr>';
+    displayMobileOrders([]);
     return;
   }
   
@@ -309,6 +318,65 @@ function displayOrders(orders) {
         </div>
       </td>
     </tr>
+  `).join('');
+  
+  // Also generate mobile cards
+  displayMobileOrders(orders);
+}
+
+// Display mobile order cards
+function displayMobileOrders(orders) {
+  // Find or create mobile container
+  let mobileContainer = document.getElementById('mobileOrdersContainer');
+  if (!mobileContainer) {
+    mobileContainer = document.createElement('div');
+    mobileContainer.id = 'mobileOrdersContainer';
+    mobileContainer.className = 'mobile-orders-container';
+    
+    // Insert after the table container
+    const tableContainer = document.querySelector('.orders-table-container');
+    if (tableContainer) {
+      tableContainer.parentNode.insertBefore(mobileContainer, tableContainer.nextSibling);
+    }
+  }
+  
+  if (orders.length === 0) {
+    mobileContainer.innerHTML = '<div class="mobile-order-card"><p>Немає замовлень</p></div>';
+    return;
+  }
+  
+  mobileContainer.innerHTML = orders.map(order => `
+    <div class="mobile-order-card">
+      <h4>Замовлення #${order._id.slice(-6)}</h4>
+      <div class="mobile-order-detail">
+        <strong>Клієнт:</strong>
+        <span>${order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Користувач видалений'}</span>
+      </div>
+      <div class="mobile-order-detail">
+        <strong>Email:</strong>
+        <span>${order.user ? order.user.email : 'N/A'}</span>
+      </div>
+      <div class="mobile-order-detail">
+        <strong>Телефон:</strong>
+        <span>${order.user ? order.user.phone || 'N/A' : 'N/A'}</span>
+      </div>
+      <div class="mobile-order-detail">
+        <strong>Шаблон:</strong>
+        <span>${order.selectedTemplate || 'Не обрано'}</span>
+      </div>
+      <div class="mobile-order-detail">
+        <strong>Статус:</strong>
+        <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span>
+      </div>
+      <div class="mobile-order-detail">
+        <strong>Дата:</strong>
+        <span>${new Date(order.createdAt).toLocaleDateString('uk-UA')}</span>
+      </div>
+      <div class="mobile-order-actions">
+        <button class="action-btn view" onclick="viewOrder('${order._id}')">Переглянути</button>
+        ${!order.confirmed ? `<button class="action-btn confirm" onclick="confirmOrder('${order._id}')">Підтвердити</button>` : ''}
+      </div>
+    </div>
   `).join('');
 }
 
@@ -421,11 +489,13 @@ function viewOrder(orderId) {
   
   // Update action buttons
   const confirmBtn = document.getElementById('confirmOrderBtn');
+  const setPriceBtn = document.getElementById('setPriceBtn');
   const priceSection = document.getElementById('priceInputSection');
   const priceInput = document.getElementById('orderPrice');
   
   if (order.confirmed || !order.user) {
     confirmBtn.style.display = 'none';
+    setPriceBtn.style.display = 'none';
     priceSection.style.display = 'none';
     if (!order.user) {
       const warningDiv = document.createElement('div');
@@ -435,12 +505,15 @@ function viewOrder(orderId) {
       document.getElementById('orderDetailsContent').appendChild(warningDiv);
     }
   } else {
-    confirmBtn.style.display = 'block';
     priceSection.style.display = 'block';
     
     // Встановлюємо поточну ціну якщо вона є
     if (order.amount) {
       priceInput.value = order.amount;
+      // Якщо ціна вже встановлена, показуємо кнопку підтвердження
+      setPriceBtn.style.display = 'none';
+      confirmBtn.style.display = 'block';
+      confirmBtn.onclick = () => confirmOrder(orderId);
     } else {
       // Встановлюємо стандартну ціну за тариф
       const defaultPrices = {
@@ -449,9 +522,12 @@ function viewOrder(orderId) {
         'blog': 12000
       };
       priceInput.value = defaultPrices[order.tariffType] || 5000;
+      
+      // Якщо ціна не встановлена, показуємо кнопку встановлення ціни
+      setPriceBtn.style.display = 'block';
+      confirmBtn.style.display = 'none';
+      setPriceBtn.onclick = () => setPriceAndSendPayment(orderId);
     }
-    
-    confirmBtn.onclick = () => confirmOrder(orderId);
   }
 }
 
@@ -575,16 +651,16 @@ function getSectionName(section) {
   return sectionNames[section] || section;
 }
 
-// Confirm order
-async function confirmOrder(orderId) {
-  console.log('confirmOrder called with orderId:', orderId);
+// Set price and send payment details to client
+async function setPriceAndSendPayment(orderId) {
+  console.log('setPriceAndSendPayment called with orderId:', orderId);
   
   // Check if user is admin
   const user = JSON.parse(localStorage.getItem('user'));
   const token = localStorage.getItem('token');
   
   if (!user || !token || user.role !== 'admin') {
-    showAlert('Доступ заборонено. Тільки адміністратори можуть підтверджувати замовлення.', 'error', 'Помилка');
+    showAlert('Доступ заборонено. Тільки адміністратори можуть встановлювати ціну.', 'error', 'Помилка');
     return;
   }
   
@@ -598,7 +674,62 @@ async function confirmOrder(orderId) {
   }
   
   const confirmed = await showConfirm(
-    `Підтвердити це замовлення з ціною ${customPrice.toLocaleString('uk-UA')} грн?`, 
+    `Встановити ціну ${customPrice.toLocaleString('uk-UA')} грн та відправити реквізити клієнту?`, 
+    'Встановлення ціни'
+  );
+  if (!confirmed) return;
+  
+  console.log('Setting price for order:', orderId, 'amount:', customPrice);
+  
+  try {
+    const response = await fetch(getAPIUrl(`/api/orders/${orderId}/set-price`), {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ amount: customPrice })
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Price set successfully:', result);
+      showAlert('Ціну встановлено! Клієнт отримав реквізити для оплати.', 'success', 'Успіх');
+      closeOrderDetails();
+      loadOrders();
+    } else {
+      let errorMessage = 'Невідома помилка сервера';
+      try {
+        const result = await response.json();
+        console.log('Error response:', result);
+        errorMessage = result.error || result.message || errorMessage;
+      } catch (jsonError) {
+        console.error('Failed to parse error response:', jsonError);
+        errorMessage = `Помилка сервера (${response.status}): ${response.statusText}`;
+      }
+      showAlert('Помилка: ' + errorMessage, 'error', 'Помилка');
+    }
+  } catch (error) {
+    console.error('Error setting price:', error);
+    showAlert('Помилка при встановленні ціни: ' + error.message, 'error', 'Помилка');
+  }
+}
+
+// Confirm order (only after price is set)
+async function confirmOrder(orderId) {
+  console.log('confirmOrder called with orderId:', orderId);
+  
+  // Check if user is admin
+  const user = JSON.parse(localStorage.getItem('user'));
+  const token = localStorage.getItem('token');
+  
+  if (!user || !token || user.role !== 'admin') {
+    showAlert('Доступ заборонено. Тільки адміністратори можуть підтверджувати замовлення.', 'error', 'Помилка');
+    return;
+  }
+  
+  const confirmed = await showConfirm(
+    'Підтвердити замовлення та сформувати договір?', 
     'Підтвердження замовлення'
   );
   if (!confirmed) return;
@@ -606,79 +737,18 @@ async function confirmOrder(orderId) {
   console.log('Confirming order:', orderId);
   
   try {
-    const token = localStorage.getItem('token');
-    let url, method, body;
-    
-    // Try different approaches based on what might work
-    // First try the original PUT method with price
-    url = getAPIUrl(`/api/orders/confirm/${orderId}`);
-    method = 'PUT';
-    body = JSON.stringify({ amount: customPrice });
-    
-    console.log('Trying PUT method first...');
-    console.log('Request URL:', url);
-    
-    let response = await fetch(url, {
-      method: method,
+    const response = await fetch(getAPIUrl(`/api/orders/confirm/${orderId}`), {
+      method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
-      },
-      body: body
+      }
     });
-    
-    console.log('Response status:', response.status);
-    
-    // If PUT fails with 500, try PATCH method
-    if (response.status === 500) {
-      console.log('PUT failed, trying PATCH method...');
-      method = 'PATCH';
-      response = await fetch(url, {
-        method: method,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ confirmed: true })
-      });
-      console.log('PATCH response status:', response.status);
-    }
-    
-    // If both fail, try POST to update endpoint
-    if (response.status === 500) {
-      console.log('PATCH failed, trying POST to update endpoint...');
-      url = getAPIUrl(`/api/orders/update/${orderId}`);
-      method = 'POST';
-      response = await fetch(url, {
-        method: method,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ confirmed: true })
-      });
-      console.log('POST update response status:', response.status);
-    }
-    
-    // If all fail, try test endpoint without auth
-    if (response.status === 500) {
-      console.log('All methods failed, trying test endpoint without auth...');
-      url = getAPIUrl(`/api/orders/confirm-test/${orderId}`);
-      method = 'POST';
-      response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ confirmed: true })
-      });
-      console.log('Test endpoint response status:', response.status);
-    }
     
     if (response.ok) {
       const result = await response.json();
       console.log('Order confirmed successfully:', result);
-      showAlert('Замовлення підтверджено!', 'success', 'Успіх');
+      showAlert('Замовлення підтверджено! Договір сформовано.', 'success', 'Успіх');
       closeOrderDetails();
       loadOrders();
     } else {
@@ -705,12 +775,274 @@ function closeOrderDetails() {
   currentOrderId = null;
 }
 
+// Tab functionality
+function initTabs() {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.dataset.tab;
+      
+      // Remove active class from all buttons and contents
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // Add active class to clicked button and corresponding content
+      button.classList.add('active');
+      const targetContent = document.getElementById(targetTab + 'Tab');
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+      
+      // Load data based on tab
+      if (targetTab === 'reviews') {
+        loadReviews();
+      } else if (targetTab === 'orders') {
+        loadOrders();
+      }
+    });
+  });
+}
+
+// Load reviews
+async function loadReviews() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl('/api/reviews/admin/all'), {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      const reviews = await response.json();
+      displayReviews(reviews);
+    } else {
+      console.error('Failed to load reviews');
+      showAlert('Помилка завантаження відгуків', 'error');
+    }
+  } catch (error) {
+    console.error('Error loading reviews:', error);
+    showAlert('Помилка завантаження відгуків', 'error');
+  }
+}
+
+// Display reviews in table
+function displayReviews(reviews) {
+  const tbody = document.getElementById('reviewsTableBody');
+  const reviewsSection = document.querySelector('#reviewsTab .reviews-section');
+  
+  if (reviews.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="loading">Відгуків поки немає</td></tr>';
+    // Clear mobile cards
+    const existingMobileCards = reviewsSection.querySelectorAll('.mobile-review-card');
+    existingMobileCards.forEach(card => card.remove());
+    return;
+  }
+
+  // Display table rows
+  tbody.innerHTML = reviews.map(review => {
+    const stars = '⭐'.repeat(review.rating);
+    const statusClass = review.isApproved ? 'approved' : (review.isVisible ? 'pending' : 'hidden');
+    const statusText = review.isApproved ? 'Схвалено' : (review.isVisible ? 'Очікує модерації' : 'Приховано');
+    
+    return `
+      <tr>
+        <td>${review.clientName}</td>
+        <td>${review.projectType}</td>
+        <td>
+          <div class="review-rating">
+            ${stars} (${review.rating}/5)
+          </div>
+        </td>
+        <td>
+          <div class="review-comment">${review.comment}</div>
+        </td>
+        <td>${new Date(review.createdAt).toLocaleDateString('uk-UA')}</td>
+        <td>
+          <span class="review-status ${statusClass}">${statusText}</span>
+        </td>
+        <td>
+          <div class="action-buttons">
+            ${!review.isApproved ? `<button class="action-btn confirm" onclick="approveReview('${review._id}')">Схвалити</button>` : ''}
+            ${review.isVisible ? `<button class="action-btn delete" onclick="hideReview('${review._id}')">Приховати</button>` : `<button class="action-btn view" onclick="showReview('${review._id}')">Показати</button>`}
+            <button class="action-btn delete" onclick="deleteReview('${review._id}')">Видалити</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Clear existing mobile cards
+  const existingMobileCards = reviewsSection.querySelectorAll('.mobile-review-card');
+  existingMobileCards.forEach(card => card.remove());
+
+  // Create mobile cards
+  const mobileCards = reviews.map(review => {
+    const stars = '⭐'.repeat(review.rating);
+    const statusClass = review.isApproved ? 'approved' : (review.isVisible ? 'pending' : 'hidden');
+    const statusText = review.isApproved ? 'Схвалено' : (review.isVisible ? 'Очікує модерації' : 'Приховано');
+    
+    const cardElement = document.createElement('div');
+    cardElement.className = 'mobile-review-card';
+    cardElement.innerHTML = `
+      <h4>
+        ${review.clientName}
+        <span class="mobile-review-rating">${stars}</span>
+      </h4>
+      <div class="mobile-review-detail">
+        <span><strong>Проект:</strong></span>
+        <span>${review.projectType}</span>
+      </div>
+      <div class="mobile-review-detail">
+        <span><strong>Дата:</strong></span>
+        <span>${new Date(review.createdAt).toLocaleDateString('uk-UA')}</span>
+      </div>
+      <div class="mobile-review-detail">
+        <span><strong>Статус:</strong></span>
+        <span class="review-status ${statusClass}">${statusText}</span>
+      </div>
+      <div class="mobile-review-comment">${review.comment}</div>
+      <div class="mobile-review-actions">
+        ${!review.isApproved ? `<button class="action-btn confirm" onclick="approveReview('${review._id}')">Схвалити</button>` : ''}
+        ${review.isVisible ? `<button class="action-btn delete" onclick="hideReview('${review._id}')">Приховати</button>` : `<button class="action-btn view" onclick="showReview('${review._id}')">Показати</button>`}
+        <button class="action-btn delete" onclick="deleteReview('${review._id}')">Видалити</button>
+      </div>
+    `;
+    return cardElement;
+  });
+
+  // Add mobile cards after the table
+  const reviewsTable = reviewsSection.querySelector('.reviews-table');
+  mobileCards.forEach(card => {
+    reviewsSection.insertBefore(card, reviewsTable.nextSibling);
+  });
+}
+
+// Approve review
+async function approveReview(reviewId) {
+  const confirmed = await showConfirm('Схвалити цей відгук для публікації?', 'Схвалення відгуку');
+  if (!confirmed) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl(`/api/reviews/admin/${reviewId}/visibility`), {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ isApproved: true, isVisible: true })
+    });
+
+    if (response.ok) {
+      showAlert('Відгук схвалено!', 'success');
+      loadReviews();
+    } else {
+      const error = await response.json();
+      showAlert('Помилка: ' + error.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error approving review:', error);
+    showAlert('Помилка при схваленні відгуку', 'error');
+  }
+}
+
+// Hide review
+async function hideReview(reviewId) {
+  const confirmed = await showConfirm('Приховати цей відгук?', 'Приховування відгуку');
+  if (!confirmed) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl(`/api/reviews/admin/${reviewId}/visibility`), {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ isVisible: false })
+    });
+
+    if (response.ok) {
+      showAlert('Відгук приховано!', 'success');
+      loadReviews();
+    } else {
+      const error = await response.json();
+      showAlert('Помилка: ' + error.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error hiding review:', error);
+    showAlert('Помилка при прихованні відгуку', 'error');
+  }
+}
+
+// Show review
+async function showReview(reviewId) {
+  const confirmed = await showConfirm('Показати цей відгук?', 'Показ відгуку');
+  if (!confirmed) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl(`/api/reviews/admin/${reviewId}/visibility`), {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ isVisible: true })
+    });
+
+    if (response.ok) {
+      showAlert('Відгук показано!', 'success');
+      loadReviews();
+    } else {
+      const error = await response.json();
+      showAlert('Помилка: ' + error.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error showing review:', error);
+    showAlert('Помилка при показі відгуку', 'error');
+  }
+}
+
+// Delete review
+async function deleteReview(reviewId) {
+  const confirmed = await showConfirm('Видалити цей відгук назавжди?', 'Видалення відгуку');
+  if (!confirmed) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(getAPIUrl(`/api/reviews/admin/${reviewId}`), {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      showAlert('Відгук видалено!', 'success');
+      loadReviews();
+    } else {
+      const error = await response.json();
+      showAlert('Помилка: ' + error.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    showAlert('Помилка при видаленні відгуку', 'error');
+  }
+}
+
 // Theme toggle functionality
-document.getElementById("themeToggle").addEventListener("click", () => {
-  const current = document.documentElement.getAttribute("data-theme");
-  const newTheme = current === "dark" ? "light" : "dark";
-  setTheme(newTheme);
-});
+const themeToggle = document.getElementById("themeToggle");
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme");
+    const newTheme = current === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+  });
+}
 
 // Mobile theme toggle
 const mobileThemeToggle = document.getElementById("themeToggleMob");
@@ -1075,6 +1407,23 @@ window.showAlert = showAlert;
 window.showConfirm = showConfirm;
 window.deleteOrder = deleteOrder;
 
+// Mobile menu functions
+function openMobileMenu() {
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (mobileMenu) {
+    mobileMenu.classList.add('open');
+    document.body.classList.add('menu-open');
+  }
+}
+
+function closeMobileMenu() {
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (mobileMenu) {
+    mobileMenu.classList.remove('open');
+    document.body.classList.remove('menu-open');
+  }
+}
+
 // Close modal when clicking outside
 window.onclick = function(event) {
   const modal = document.getElementById('orderDetailsModal');
@@ -1087,3 +1436,40 @@ window.onclick = function(event) {
     closePopup();
   }
 }
+
+// Add mobile menu event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile menu handlers
+  const openMenuBtn = document.getElementById('openMenu');
+  const closeMenuBtn = document.getElementById('closeMenu');
+  
+  if (openMenuBtn) {
+    openMenuBtn.addEventListener('click', openMobileMenu);
+  }
+  
+  if (closeMenuBtn) {
+    closeMenuBtn.addEventListener('click', closeMobileMenu);
+  }
+  
+  // Close mobile menu when clicking on menu links
+  const mobileMenuLinks = document.querySelectorAll('.header__mob__menu__list__li a');
+  mobileMenuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      // Only close menu if it's not a # link (prevent closing on dropdown toggles)
+      if (!link.getAttribute('href').startsWith('#')) {
+        setTimeout(closeMobileMenu, 100);
+      }
+    });
+  });
+  
+  // Close mobile menu on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeMobileMenu();
+    }
+  });
+});
+
+// Make mobile menu functions globally available
+window.openMobileMenu = openMobileMenu;
+window.closeMobileMenu = closeMobileMenu;

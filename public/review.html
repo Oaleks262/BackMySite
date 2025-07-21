@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Залишити відгук - Growth-tech</title>
+    <meta name="description" content="Залиште відгук про якість наших послуг розробки веб-сайтів">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .review-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .review-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .review-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .review-header p {
+            color: #7f8c8d;
+        }
+        
+        .project-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .rating-section {
+            margin-bottom: 25px;
+        }
+        
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .star {
+            font-size: 32px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .star:hover,
+        .star.active {
+            color: #ffd700;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="review-container">
+        <div class="review-header">
+            <h1>🌟 Залишити відгук</h1>
+            <p>Ваша думка важлива для нас!</p>
+        </div>
+
+        <div id="loadingSection" class="loading">
+            <p>Завантаження інформації про замовлення...</p>
+        </div>
+
+        <div id="errorSection" style="display: none;">
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div id="reviewForm" style="display: none;">
+            <div class="project-info">
+                <h3>Інформація про проект</h3>
+                <p><strong>Клієнт:</strong> <span id="clientName"></span></p>
+                <p><strong>Тип проекту:</strong> <span id="projectType"></span></p>
+            </div>
+
+            <form id="reviewSubmissionForm">
+                <div class="rating-section">
+                    <label>Оцініть якість нашої роботи:</label>
+                    <div class="rating-stars" id="ratingStars">
+                        <span class="star" data-rating="1">⭐</span>
+                        <span class="star" data-rating="2">⭐</span>
+                        <span class="star" data-rating="3">⭐</span>
+                        <span class="star" data-rating="4">⭐</span>
+                        <span class="star" data-rating="5">⭐</span>
+                    </div>
+                    <input type="hidden" id="rating" name="rating" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="comment">Ваш відгук:</label>
+                    <textarea 
+                        id="comment" 
+                        name="comment" 
+                        placeholder="Розкажіть про свій досвід роботи з нами, що сподобалось, що можна покращити..."
+                        maxlength="1000"
+                        required
+                    ></textarea>
+                    <div class="char-counter">
+                        <span id="charCount">0</span>/1000 символів
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Відправити відгук
+                </button>
+            </form>
+        </div>
+
+        <div id="successSection" style="display: none;">
+            <div class="success-message">
+                <h3>Дякуємо за ваш відгук!</h3>
+                <p>Ваш відгук був успішно відправлений і буде опублікований після модерації.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get API base URL
+        const API_BASE = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5000' 
+            : 'https://growth-tech.com.ua';
+
+        // Get order ID from URL
+        const pathParts = window.location.pathname.split('/');
+        const orderId = pathParts[pathParts.length - 1];
+
+        let selectedRating = 0;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!orderId) {
+                showError('Невірне посилання. ID замовлення не знайдено.');
+                return;
+            }
+
+            await loadOrderInfo();
+            setupRatingStars();
+            setupCharCounter();
+            setupFormSubmission();
+        });
+
+        // Load order information
+        async function loadOrderInfo() {
+            try {
+                document.getElementById('loadingSection').style.display = 'block';
+                
+                const response = await fetch(`${API_BASE}/api/reviews/form/${orderId}`);
+                const data = await response.json();
+
+                document.getElementById('loadingSection').style.display = 'none';
+
+                if (!response.ok) {
+                    showError(data.error || 'Помилка завантаження даних');
+                    return;
+                }
+
+                // Fill form data
+                document.getElementById('clientName').textContent = data.clientName;
+                document.getElementById('projectType').textContent = data.projectType;
+                document.getElementById('reviewForm').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loadingSection').style.display = 'none';
+                showError('Помилка підключення до сервера');
+            }
+        }
+
+        // Setup rating stars
+        function setupRatingStars() {
+            const stars = document.querySelectorAll('.star');
+            
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    selectedRating = parseInt(star.dataset.rating);
+                    document.getElementById('rating').value = selectedRating;
+                    updateStars();
+                });
+                
+                star.addEventListener('mouseover', () => {
+                    const hoverRating = parseInt(star.dataset.rating);
+                    highlightStars(hoverRating);
+                });
+            });
+
+            document.getElementById('ratingStars').addEventListener('mouseleave', () => {
+                updateStars();
+            });
+        }
+
+        // Update star display
+        function updateStars() {
+            highlightStars(selectedRating);
+        }
+
+        // Highlight stars up to rating
+        function highlightStars(rating) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Setup character counter
+        function setupCharCounter() {
+            const textarea = document.getElementById('comment');
+            const counter = document.getElementById('charCount');
+
+            textarea.addEventListener('input', () => {
+                counter.textContent = textarea.value.length;
+            });
+        }
+
+        // Setup form submission
+        function setupFormSubmission() {
+            const form = document.getElementById('reviewSubmissionForm');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!selectedRating) {
+                    showError('Будь ласка, оберіть оцінку');
+                    return;
+                }
+
+                const comment = document.getElementById('comment').value.trim();
+                if (comment.length < 10) {
+                    showError('Коментар має містити мінімум 10 символів');
+                    return;
+                }
+
+                await submitReview();
+            });
+        }
+
+        // Submit review
+        async function submitReview() {
+            try {
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Відправляємо...';
+
+                const formData = {
+                    rating: selectedRating,
+                    comment: document.getElementById('comment').value.trim()
+                };
+
+                const response = await fetch(`${API_BASE}/api/reviews/submit/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    showError(result.error || 'Помилка відправки відгуку');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Відправити відгук';
+                    return;
+                }
+
+                // Show success
+                document.getElementById('reviewForm').style.display = 'none';
+                document.getElementById('successSection').style.display = 'block';
+
+            } catch (error) {
+                showError('Помилка підключення до сервера');
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Відправити відгук';
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorSection').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

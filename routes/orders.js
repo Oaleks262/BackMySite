@@ -6,7 +6,8 @@ const {
   getMyOrder,
   confirmOrder,
   getAllOrders,
-  updateOrderStatus
+  updateOrderStatus,
+  setPriceAndSendPayment
 } = require('../controllers/orderController');
 const { auth, isAdmin } = require('../middleware/auth');
 
@@ -21,5 +22,6 @@ router.post('/update/:orderId', auth, isAdmin, confirmOrder);
 router.post('/confirm-test/:orderId', confirmOrder);
 router.get('/all', auth, isAdmin, getAllOrders);
 router.put('/:orderId/status', auth, isAdmin, updateOrderStatus);
+router.post('/:orderId/set-price', auth, isAdmin, setPriceAndSendPayment);
 
 module.exports = router;

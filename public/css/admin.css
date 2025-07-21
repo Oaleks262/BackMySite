@@ -1,5 +1,14 @@
 /* Admin Panel Styles */
 
+/* Global overflow prevention */
+* {
+  box-sizing: border-box;
+}
+
+.admin, .admin * {
+  max-width: 100%;
+}
+
 /* User Menu Styles */
 .user-menu-overlay {
   position: fixed;
@@ -176,6 +185,13 @@
   padding: 30px;
 }
 
+.orders-section,
+.reviews-section {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -183,6 +199,8 @@
   margin-bottom: 25px;
   flex-wrap: wrap;
   gap: 15px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .section-header h2 {
@@ -224,6 +242,8 @@
 /* Orders Table */
 .orders-table {
   overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
 }
 
 .orders-table table {
@@ -329,6 +349,128 @@
   background: #ff3838;
 }
 
+.action-btn.primary {
+  background: #007bff;
+  color: white;
+  font-weight: 500;
+}
+
+.action-btn.primary:hover {
+  background: #0056b3;
+}
+
+/* Admin Tabs */
+.admin-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 30px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-btn:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Reviews Table Styles */
+.reviews-table {
+  background: var(--color-background);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.reviews-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reviews-table th {
+  background: var(--color-surface);
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reviews-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.review-rating {
+  display: flex;
+  gap: 2px;
+}
+
+.review-rating .star {
+  color: #ffd700;
+  font-size: 14px;
+}
+
+.review-comment {
+  max-width: 300px;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.review-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.review-status.approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.review-status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.review-status.hidden {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Mobile Review Cards (hidden by default) */
+.mobile-review-card {
+  display: none;
+}
+
 /* Order Details Modal */
 .modal-content.large {
   max-width: 800px;
@@ -430,10 +572,15 @@
 @media (max-width: 767.98px) {
   .admin {
     padding: 60px 0 20px;
+    width: 100%;
+    overflow-x: hidden;
   }
   
   .admin__content {
     padding: 0 15px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .admin__stats {
@@ -476,17 +623,124 @@
   
   .orders-table-container {
     overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
   }
   
   .orders-table {
-    font-size: 12px;
-    min-width: 600px;
+    font-size: 11px;
+    min-width: 650px;
+    width: 100%;
+    border-radius: 8px;
+    background: var(--color-background);
+  }
+  
+  .orders-table table {
+    background: var(--color-background);
   }
   
   .orders-table th,
   .orders-table td {
-    padding: 8px 4px;
+    padding: 6px 4px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+  
+  /* Specific column widths for mobile */
+  .orders-table th:nth-child(1),
+  .orders-table td:nth-child(1) {
+    max-width: 60px; /* ID */
+  }
+  
+  .orders-table th:nth-child(2),
+  .orders-table td:nth-child(2) {
+    max-width: 100px; /* Client name */
+  }
+  
+  .orders-table th:nth-child(3),
+  .orders-table td:nth-child(3) {
+    max-width: 120px; /* Email */
+  }
+  
+  .orders-table th:nth-child(4),
+  .orders-table td:nth-child(4) {
+    max-width: 80px; /* Phone */
+  }
+  
+  .orders-table th:nth-child(5),
+  .orders-table td:nth-child(5) {
+    max-width: 70px; /* Template */
+  }
+  
+  .orders-table th:nth-child(6),
+  .orders-table td:nth-child(6) {
+    max-width: 80px; /* Status */
+  }
+  
+  .orders-table th:nth-child(7),
+  .orders-table td:nth-child(7) {
+    max-width: 80px; /* Date */
+  }
+  
+  .orders-table th:nth-child(8),
+  .orders-table td:nth-child(8) {
+    max-width: 120px; /* Actions */
+  }
+  
+  /* Card-style layout for mobile orders */
+  .mobile-orders-container {
+    display: none;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .mobile-order-card {
+    display: none;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .mobile-order-card h4 {
+    margin: 0 0 10px 0;
+    color: var(--color-text);
+    font-size: 16px;
+  }
+  
+  .mobile-order-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  
+  .mobile-order-detail strong {
+    color: var(--color-text);
+  }
+  
+  .mobile-order-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .mobile-order-actions .action-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    font-size: 12px;
   }
   
   .modal-content.large {
@@ -498,13 +752,325 @@
   
   .action-buttons {
     flex-direction: column;
-    gap: 5px;
+    gap: 3px;
+    width: 100%;
+    max-width: 100%;
   }
   
   .action-btn {
     width: 100%;
-    padding: 8px;
+    padding: 6px 4px;
+    font-size: 10px;
+    min-height: 28px;
+    white-space: nowrap;
+    border-radius: 4px;
+    text-align: center;
+    box-sizing: border-box;
+    line-height: 1.2;
+  }
+  
+  /* Admin Tabs Mobile */
+  .admin-tabs {
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+  
+  .tab-btn {
+    padding: 15px 20px;
+    font-size: 16px;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+  }
+  
+  .tab-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-bottom-color: var(--color-primary);
+  }
+  
+  /* Reviews Table Mobile */
+  .reviews-table {
     font-size: 12px;
+    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .reviews-table table {
+    min-width: 700px;
+    width: 100%;
+  }
+  
+  .reviews-table th,
+  .reviews-table td {
+    padding: 8px 4px;
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .review-comment {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Improved table visibility on very small screens */
+  @media (max-width: 480px) {
+    .orders-table {
+      display: block;
+      font-size: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .orders-table table {
+      min-width: 520px;
+      width: 100%;
+      background: var(--color-background);
+    }
+    
+    .orders-table th,
+    .orders-table td {
+      padding: 4px 2px;
+      font-size: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+    }
+    
+    /* Improved column widths for mobile */
+    .orders-table th:nth-child(1),
+    .orders-table td:nth-child(1) {
+      width: 40px; /* ID */
+      max-width: 40px;
+    }
+    
+    .orders-table th:nth-child(2),
+    .orders-table td:nth-child(2) {
+      width: 70px; /* Client name */
+      max-width: 70px;
+    }
+    
+    .orders-table th:nth-child(3),
+    .orders-table td:nth-child(3) {
+      width: 90px; /* Email */
+      max-width: 90px;
+    }
+    
+    .orders-table th:nth-child(4),
+    .orders-table td:nth-child(4) {
+      width: 65px; /* Phone */
+      max-width: 65px;
+    }
+    
+    .orders-table th:nth-child(5),
+    .orders-table td:nth-child(5) {
+      width: 50px; /* Template */
+      max-width: 50px;
+    }
+    
+    .orders-table th:nth-child(6),
+    .orders-table td:nth-child(6) {
+      width: 60px; /* Status */
+      max-width: 60px;
+    }
+    
+    .orders-table th:nth-child(7),
+    .orders-table td:nth-child(7) {
+      width: 60px; /* Date */
+      max-width: 60px;
+    }
+    
+    .orders-table th:nth-child(8),
+    .orders-table td:nth-child(8) {
+      width: 85px; /* Actions */
+      max-width: 85px;
+    }
+    
+    /* Mobile action buttons - stacked vertically */
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .action-btn {
+      width: 100%;
+      padding: 3px 4px;
+      font-size: 8px;
+      min-height: 18px;
+      white-space: nowrap;
+      border-radius: 3px;
+      line-height: 1.2;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    
+    /* Status badges for mobile */
+    .status-badge {
+      padding: 2px 4px;
+      border-radius: 8px;
+      font-size: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .mobile-order-card {
+      display: none;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .admin__stats {
+      grid-template-columns: 1fr;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .filters {
+      flex-direction: column;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    /* Hide reviews table and show cards */
+    .reviews-table {
+      display: none;
+    }
+    
+    .mobile-review-card {
+      display: block;
+      background: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .mobile-review-card h4 {
+      margin: 0 0 10px 0;
+      color: var(--color-text);
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .mobile-review-rating {
+      font-size: 14px;
+    }
+    
+    .mobile-review-detail {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .mobile-review-detail strong {
+      color: var(--color-text);
+    }
+    
+    .mobile-review-comment {
+      background: var(--color-surface);
+      padding: 12px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-style: italic;
+      line-height: 1.4;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
+    }
+    
+    .mobile-review-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .mobile-review-actions .action-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    
+    .tab-btn {
+      padding: 18px 20px;
+      font-size: 18px;
+    }
+    
+    .modal-content.large {
+      margin: 1% auto;
+      width: 98%;
+      max-height: 95vh;
+    }
+    
+    .section-header h2 {
+      font-size: 18px;
+    }
+    
+    .order-detail-section {
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .detail-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    
+    .price-input-section {
+      margin: 15px 0;
+    }
+    
+    .price-input-section input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+    }
+    
+    .filters select,
+    .filters button {
+      width: 100%;
+      min-width: auto;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .section-header {
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .orders-section,
+    .reviews-section {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
   }
 }
 
@@ -543,6 +1109,28 @@
   .orders-table th,
   .orders-table td {
     padding: 12px 8px;
+  }
+  
+  .reviews-table {
+    font-size: 14px;
+  }
+  
+  .reviews-table th,
+  .reviews-table td {
+    padding: 12px 8px;
+  }
+  
+  .review-comment {
+    max-width: 250px;
+  }
+  
+  .admin-tabs {
+    gap: 5px;
+  }
+  
+  .tab-btn {
+    padding: 10px 16px;
+    font-size: 15px;
   }
   
   .modal-content.large {

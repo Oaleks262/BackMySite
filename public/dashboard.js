@@ -65,6 +65,25 @@ document.addEventListener('DOMContentLoaded', function() {
   const saved = localStorage.getItem("theme") || "light";
   setTheme(saved);
   
+  // Set up theme toggle button listeners
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const newTheme = current === "dark" ? "light" : "dark";
+      setTheme(newTheme);
+    });
+  }
+
+  const themeToggleMob = document.getElementById('themeToggleMob');
+  if (themeToggleMob) {
+    themeToggleMob.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const newTheme = current === "dark" ? "light" : "dark";
+      setTheme(newTheme);
+    });
+  }
+  
   // Load existing order if any
   loadUserOrder();
   
@@ -1666,6 +1685,22 @@ function loadListItems(containerId, items, fields, itemClass) {
   });
 }
 
+// Theme toggle functionality
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+  const icon = document.getElementById("icon");
+  const iconMob = document.getElementById("iconMob");
+  const themeIcon = theme === "dark" ? "☀️" : "🌙";
+  
+  if (icon) {
+    icon.textContent = themeIcon;
+  }
+  if (iconMob) {
+    iconMob.textContent = themeIcon;
+  }
+}
+
 // Logout functionality
 function logout() {
   localStorage.removeItem('token');
@@ -1683,4 +1718,5 @@ window.showAlert = showAlert;
 window.showConfirm = showConfirm;
 window.loadUserOrder = loadUserOrder;
 window.logout = logout;
+window.setTheme = setTheme;
 

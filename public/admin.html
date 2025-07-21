@@ -87,6 +87,7 @@
         <li class="header__mob__menu__list__li"><a href="/">Головна</a></li>
         <li class="header__mob__menu__list__li"><a href="/#cont">Про нас</a></li>
         <li class="header__mob__menu__list__li"><a href="/#price">Ціна</a></li>
+        <li class="header__mob__menu__list__li"><a href="/settings.html">⚙️ Налаштування</a></li>
         <li class="header__mob__menu__list__li"><a href="#" id="passwordChangeBtnMob">Змінити пароль</a></li>
         <li class="header__mob__menu__list__li"><a href="#" id="userNameDisplayMob">Адміністратор</a></li>
         <li class="header__mob__menu__list__li" style="margin-top: 44px;">
@@ -123,7 +124,13 @@
         </div>
       </div>
 
-      <div class="orders-section">
+      <!-- Admin Tabs -->
+      <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="orders">Замовлення</button>
+        <button class="tab-btn" data-tab="reviews">Відгуки</button>
+      </div>
+
+      <div class="orders-section tab-content active" id="ordersTab">
         <div class="section-header">
           <h2>Замовлення</h2>
           <div class="filters">
@@ -136,23 +143,62 @@
           </div>
         </div>
 
-        <div class="orders-table">
+        <div class="orders-table-container">
+          <div class="orders-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Клієнт</th>
+                  <th>Email</th>
+                  <th>Телефон</th>
+                  <th>Шаблон</th>
+                  <th>Статус</th>
+                  <th>Дата створення</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <tr>
+                  <td colspan="8" class="loading">Завантаження...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Tab -->
+      <div class="reviews-section tab-content" id="reviewsTab" style="display: none;">
+        <div class="section-header">
+          <h2>Відгуки клієнтів</h2>
+          <div class="filters">
+            <select id="reviewStatusFilter">
+              <option value="">Всі відгуки</option>
+              <option value="approved">Схвалені</option>
+              <option value="pending">Очікують модерації</option>
+              <option value="hidden">Приховані</option>
+            </select>
+            <button id="refreshReviewsBtn" class="refresh-btn">Оновити</button>
+          </div>
+        </div>
+
+        <div class="reviews-table">
           <table>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Клієнт</th>
-                <th>Email</th>
-                <th>Телефон</th>
-                <th>Шаблон</th>
+                <th>Проект</th>
+                <th>Оцінка</th>
+                <th>Відгук</th>
+                <th>Дата</th>
                 <th>Статус</th>
-                <th>Дата створення</th>
                 <th>Дії</th>
               </tr>
             </thead>
-            <tbody id="ordersTableBody">
+            <tbody id="reviewsTableBody">
               <tr>
-                <td colspan="8" class="loading">Завантаження...</td>
+                <td colspan="7" class="loading">Завантаження...</td>
               </tr>
             </tbody>
           </table>
@@ -175,8 +221,9 @@
       <div class="price-input-section" id="priceInputSection" style="display: none;">
         <label for="orderPrice">Ціна проекту (грн):</label>
         <input type="number" id="orderPrice" placeholder="Введіть ціну в гривнях" min="0" step="100">
-        <small>Ця ціна буде використана в договорі замість стандартної ціни за тариф</small>
+        <small>Спочатку встановіть ціну та відправте реквізити клієнту, потім підтвердіть замовлення</small>
       </div>
+      <button id="setPriceBtn" class="action-btn primary">Встановити ціну та відправити реквізити</button>
       <button id="confirmOrderBtn" class="action-btn confirm">Підтвердити замовлення</button>
       <button id="deleteOrderBtn" class="action-btn delete">Видалити замовлення</button>
     </div>

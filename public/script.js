@@ -30,7 +30,16 @@ const icon = document.getElementById("icon");
 function setTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem("theme", theme);
-  icon.textContent = theme === "dark" ? "☀️" : "🌙";
+  const icon = document.getElementById("icon");
+  const iconMob = document.getElementById("iconMob");
+  const themeIcon = theme === "dark" ? "☀️" : "🌙";
+  
+  if (icon) {
+    icon.textContent = themeIcon;
+  }
+  if (iconMob) {
+    iconMob.textContent = themeIcon;
+  }
 }
 
 toggleBtn.addEventListener("click", () => {
@@ -44,22 +53,14 @@ setTheme(saved);
 
 
 const toggleBtnMob = document.getElementById("themeToggleMob");
-const iconMob = document.getElementById("icon");
 
-function setTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem("theme", theme);
-  icon.textContent = theme === "dark" ? "☀️" : "🌙";
+if (toggleBtnMob) {
+  toggleBtnMob.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme");
+    const newTheme = current === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+  });
 }
-
-toggleBtnMob.addEventListener("click", () => {
-  const current = document.documentElement.getAttribute("data-theme");
-  const newTheme = current === "dark" ? "light" : "dark";
-  setTheme(newTheme);
-});
-
-const savedMob = localStorage.getItem("theme") || "light";
-setTheme(savedMob);
 
 
 
@@ -435,9 +436,65 @@ function showSimpleLogout() {
   }
 }
 
+// Load reviews for homepage
+async function loadReviews() {
+  const reviewsContainer = document.getElementById('reviewsContainer');
+  
+  if (!reviewsContainer) return; // Not on homepage
+  
+  try {
+    const response = await fetch(getAPIUrl('/api/reviews/public'));
+    
+    if (response.ok) {
+      const reviews = await response.json();
+      displayReviews(reviews, reviewsContainer);
+    } else {
+      console.error('Failed to load reviews');
+      reviewsContainer.innerHTML = '<div class="reviews__empty"><p>Поки що відгуків немає</p></div>';
+    }
+  } catch (error) {
+    console.error('Error loading reviews:', error);
+    reviewsContainer.innerHTML = '<div class="reviews__empty"><p>Помилка завантаження відгуків</p></div>';
+  }
+}
+
+// Display reviews in homepage
+function displayReviews(reviews, container) {
+  if (reviews.length === 0) {
+    container.innerHTML = '<div class="reviews__empty"><p>Поки що відгуків немає, але ви можете стати першим!</p></div>';
+    return;
+  }
+
+  const reviewsHTML = reviews.map(review => {
+    const stars = '⭐'.repeat(review.rating);
+    const date = new Date(review.createdAt).toLocaleDateString('uk-UA', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    return `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-client">${review.clientName}</div>
+          <div class="review-rating">
+            ${stars}
+          </div>
+        </div>
+        <div class="review-project">${review.projectType}</div>
+        <div class="review-comment">${review.comment}</div>
+        <div class="review-date">${date}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = reviewsHTML;
+}
+
 // Initialize user interface on page load
 document.addEventListener('DOMContentLoaded', function() {
   updateUserInterface();
+  loadReviews(); // Load reviews on homepage
 });
 
 // Popup Modal System
