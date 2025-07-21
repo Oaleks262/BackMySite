@@ -1179,7 +1179,10 @@ async function updateOrderStatus(orderId) {
 
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(getAPIUrl(`/api/orders/${orderId}/status`), {
+    const url = getAPIUrl(`/api/orders/${orderId}/status`);
+    console.log('Updating order status:', { orderId, newStatus, url, token: token ? 'present' : 'missing' });
+    
+    const response = await fetch(url, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1188,8 +1191,12 @@ async function updateOrderStatus(orderId) {
       body: JSON.stringify({ status: newStatus })
     });
 
+    console.log('Response status:', response.status, response.statusText);
+    console.log('Response headers:', [...response.headers.entries()]);
+
     if (response.ok) {
       const result = await response.json();
+      console.log('Success response:', result);
       showAlert('Статус замовлення успішно оновлено', 'success', 'Успіх');
       closeStatusModal();
       
@@ -1202,11 +1209,12 @@ async function updateOrderStatus(orderId) {
       }
     } else {
       const error = await response.text();
+      console.error('Error response:', error);
       showAlert(`Помилка оновлення статусу: ${error}`, 'error', 'Помилка');
     }
   } catch (error) {
     console.error('Error updating order status:', error);
-    showAlert(`Помилка з'єднання з сервером', 'error', 'Помилка'`);
+    showAlert(`Помилка з'єднання з сервером`, 'error', 'Помилка');
   }
 }
 
