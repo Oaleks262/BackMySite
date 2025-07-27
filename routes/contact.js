@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sendEmail = require('../utils/sendEmail');
+const { createResponsiveEmailTemplate, createEmailSection, createInfoBlock } = require('../utils/emailTemplate');
 
 const sendContactMessage = async (req, res) => {
   const { name, email, message } = req.body;
@@ -22,50 +23,66 @@ const sendContactMessage = async (req, res) => {
 
   try {
     // Send email to company
+    const companyEmailContent = createEmailSection(`
+      <h3 class="email-subtitle" style="color: #2c3e50; margin-top: 0; font-size: 16px;">📋 Деталі заявки:</h3>
+      <p class="email-text" style="margin: 10px 0; font-size: 14px;"><strong>Ім'я:</strong> ${name}</p>
+      <p class="email-text" style="margin: 10px 0; font-size: 14px;"><strong>Email:</strong> ${email}</p>
+      <p class="email-text" style="margin: 10px 0; font-size: 14px;"><strong>Час:</strong> ${new Date().toLocaleString('uk-UA')}</p>
+    `) + createInfoBlock('💬 Повідомлення клієнта:', `
+      <div style="font-style: italic; line-height: 1.6; word-break: break-word;">
+        ${message}
+      </div>
+    `, 'info') + createEmailSection(`
+      <p style="font-size: 12px; color: #666; margin: 0; text-align: center;">
+        Надіслано через контактну форму сайту
+      </p>
+    `, '#f8f9fa');
+
+    const companyEmailTemplate = createResponsiveEmailTemplate(
+      '📧 Нова заявка з сайту',
+      companyEmailContent,
+      { footerText: 'Адмін-панель Growth Tech' }
+    );
+
     await sendEmail(
       process.env.SMTP_EMAIL || 'growthtech.contact@gmail.com',
       'Нова заявка з сайту',
-      `
-      <h2>Нова заявка з контактної форми</h2>
-      <p><strong>Ім'я:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Час:</strong> ${new Date().toLocaleString('uk-UA')}</p>
-      <p><strong>Повідомлення:</strong></p>
-      <div style="background: #f5f5f5; padding: 15px; border-left: 4px solid #26B26A; margin: 10px 0;">
-        ${message}
-      </div>
-      <hr>
-      <p><small>Надіслано через контактну форму сайту</small></p>
-      `
+      companyEmailTemplate
     );
     console.log('Company notification sent for contact form from:', email);
 
     // Send confirmation email to user
+    const userEmailContent = createEmailSection(`
+      <h2 class="email-subtitle" style="color: #26B26A; margin-top: 0; font-size: 18px;">Дякуємо за звернення!</h2>
+      <p class="email-text" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+        Вітаю, <strong>${name}</strong>!
+      </p>
+      <p class="email-text" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+        Ми отримали ваше повідомлення і зв'яжемося з вами найближчим часом.
+      </p>
+    `, '#e8f5e8') + createInfoBlock('📝 Ваше повідомлення:', `
+      <div style="font-style: italic; line-height: 1.6; word-break: break-word;">
+        ${message}
+      </div>
+    `, 'info') + createEmailSection(`
+      <p class="email-text" style="margin: 0; font-size: 14px; text-align: center;">
+        <strong>Час отримання:</strong> ${new Date().toLocaleString('uk-UA')}
+      </p>
+    `, '#f8f9fa');
+
+    const userEmailTemplate = createResponsiveEmailTemplate(
+      '✅ Підтвердження отримання повідомлення',
+      userEmailContent,
+      { 
+        footerText: 'З повагою,',
+        footerEmail: process.env.SMTP_EMAIL
+      }
+    );
+
     await sendEmail(
       email,
       'Підтвердження отримання повідомлення - Growth Tech',
-      `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #26B26A;">Дякуємо за звернення!</h2>
-        <p>Вітаю, <strong>${name}</strong>!</p>
-        <p>Ми отримали ваше повідомлення і зв'яжемося з вами найближчим часом.</p>
-        
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <h3>Ваше повідомлення:</h3>
-          <p style="font-style: italic;">${message}</p>
-        </div>
-        
-        <p>Час отримання: ${new Date().toLocaleString('uk-UA')}</p>
-        
-        <hr style="margin: 30px 0;">
-        <p style="color: #666;">
-          З повагою,<br>
-          <strong>Команда Growth Tech</strong><br>
-          Email: ${process.env.SMTP_EMAIL}<br>
-          Сайт: growth-tech.com.ua
-        </p>
-      </div>
-      `
+      userEmailTemplate
     );
     console.log('Confirmation email sent to user:', email);
 

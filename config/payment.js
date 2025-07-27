@@ -2,7 +2,7 @@
 module.exports = {
   // Банківські реквізити
   bankDetails: {
-    recipient: process.env.BANK_RECIPIENT || 'ФОП Іваненко Іван Іванович',
+    recipient: process.env.BANK_RECIPIENT || 'Звірич Олександр Миколайович',
     iban: process.env.BANK_IBAN || 'UA213223130000026007233566001',
     bank: process.env.BANK_NAME || 'ПриватБанк',
     currency: process.env.PAYMENT_CURRENCY || 'USD'

@@ -298,7 +298,6 @@ function displayOrders(orders) {
   
   if (orders.length === 0) {
     tbody.innerHTML = '<tr><td colspan="8" class="loading">Немає замовлень</td></tr>';
-    displayMobileOrders([]);
     return;
   }
   
@@ -319,66 +318,9 @@ function displayOrders(orders) {
       </td>
     </tr>
   `).join('');
-  
-  // Also generate mobile cards
-  displayMobileOrders(orders);
 }
 
-// Display mobile order cards
-function displayMobileOrders(orders) {
-  // Find or create mobile container
-  let mobileContainer = document.getElementById('mobileOrdersContainer');
-  if (!mobileContainer) {
-    mobileContainer = document.createElement('div');
-    mobileContainer.id = 'mobileOrdersContainer';
-    mobileContainer.className = 'mobile-orders-container';
-    
-    // Insert after the table container
-    const tableContainer = document.querySelector('.orders-table-container');
-    if (tableContainer) {
-      tableContainer.parentNode.insertBefore(mobileContainer, tableContainer.nextSibling);
-    }
-  }
-  
-  if (orders.length === 0) {
-    mobileContainer.innerHTML = '<div class="mobile-order-card"><p>Немає замовлень</p></div>';
-    return;
-  }
-  
-  mobileContainer.innerHTML = orders.map(order => `
-    <div class="mobile-order-card">
-      <h4>Замовлення #${order._id.slice(-6)}</h4>
-      <div class="mobile-order-detail">
-        <strong>Клієнт:</strong>
-        <span>${order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Користувач видалений'}</span>
-      </div>
-      <div class="mobile-order-detail">
-        <strong>Email:</strong>
-        <span>${order.user ? order.user.email : 'N/A'}</span>
-      </div>
-      <div class="mobile-order-detail">
-        <strong>Телефон:</strong>
-        <span>${order.user ? order.user.phone || 'N/A' : 'N/A'}</span>
-      </div>
-      <div class="mobile-order-detail">
-        <strong>Шаблон:</strong>
-        <span>${order.selectedTemplate || 'Не обрано'}</span>
-      </div>
-      <div class="mobile-order-detail">
-        <strong>Статус:</strong>
-        <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span>
-      </div>
-      <div class="mobile-order-detail">
-        <strong>Дата:</strong>
-        <span>${new Date(order.createdAt).toLocaleDateString('uk-UA')}</span>
-      </div>
-      <div class="mobile-order-actions">
-        <button class="action-btn view" onclick="viewOrder('${order._id}')">Переглянути</button>
-        ${!order.confirmed ? `<button class="action-btn confirm" onclick="confirmOrder('${order._id}')">Підтвердити</button>` : ''}
-      </div>
-    </div>
-  `).join('');
-}
+// Mobile orders functionality removed
 
 // Get status text in Ukrainian
 function getStatusText(status) {

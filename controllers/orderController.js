@@ -8,6 +8,7 @@ const { generatePDF } = require('../utils/generatePDF');
 const path = require('path');
 const fs = require('fs');
 const paymentConfig = require('../config/payment');
+const { createResponsiveEmailTemplate, createEmailSection, createEmailTable, createEmailButton, createInfoBlock } = require('../utils/emailTemplate');
 
 // Функція для генерації email з реквізитами оплати (тільки з встановленою ціною)
 const generatePaymentEmailTemplate = (order, user) => {
@@ -38,85 +39,73 @@ const generatePaymentEmailTemplate = (order, user) => {
   const selectedFeatures = Object.keys(additionalFeatures).filter(feature => additionalFeatures[feature]);
   
   if (selectedFeatures.length > 0) {
-    additionalFeaturesHtml = '<h3>Додаткові функції:</h3><ul>';
+    additionalFeaturesHtml = '<h4 class="email-subtitle" style="color: #2c3e50; margin-top: 15px; font-size: 14px;">Додаткові функції:</h4><ul style="margin: 10px 0; padding-left: 20px; line-height: 1.6;">';
     selectedFeatures.forEach(feature => {
       if (featureNames[feature]) {
-        additionalFeaturesHtml += `<li>${featureNames[feature]}</li>`;
+        additionalFeaturesHtml += `<li style="margin-bottom: 5px; font-size: 14px;">${featureNames[feature]}</li>`;
       }
     });
     additionalFeaturesHtml += '</ul>';
   }
-  
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
-      <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h1 style="color: #2c3e50; text-align: center; margin-bottom: 30px;">💳 Реквізити для оплати</h1>
-        
-        <div style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-          <h2 style="color: #27ae60; margin-top: 0;">Вітаємо, ${user.firstName} ${user.lastName}!</h2>
-          <p style="margin: 10px 0; line-height: 1.6;">Дякуємо за заповнення всіх даних для вашого сайту. Тепер можете оплатити замовлення за реквізитами нижче.</p>
-        </div>
-        
-        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-          <h3 style="color: #2c3e50; margin-top: 0;">📋 Деталі замовлення:</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 8px 0; font-weight: bold;">Тип сайту:</td>
-              <td style="padding: 8px 0;">${templateNames[order.tariffType] || order.tariffType}</td>
-            </tr>
-            <tr style="border-bottom: 2px solid #2c3e50;">
-              <td style="padding: 8px 0; font-weight: bold; font-size: 18px;">Загальна сума:</td>
-              <td style="padding: 8px 0; font-weight: bold; font-size: 18px; color: #e74c3c;">${totalPrice} ${bankDetails.currency}</td>
-            </tr>
-          </table>
-          ${additionalFeaturesHtml}
-        </div>
-        
-        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-          <h3 style="color: #856404; margin-top: 0;">💰 Реквізити для оплати:</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 12px 0; font-weight: bold; width: 40%;">Одержувач:</td>
-              <td style="padding: 12px 0; font-family: monospace;">${bankDetails.recipient}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 12px 0; font-weight: bold;">IBAN:</td>
-              <td style="padding: 12px 0; font-family: monospace; background-color: #fff; padding: 8px; border-radius: 4px;">${bankDetails.iban}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 12px 0; font-weight: bold;">Банк:</td>
-              <td style="padding: 12px 0; font-family: monospace;">${bankDetails.bank}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 12px 0; font-weight: bold;">Призначення платежу:</td>
-              <td style="padding: 12px 0; font-family: monospace;">Оплата за розробку сайту. Замовлення #${order._id.toString().slice(-6)}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px 0; font-weight: bold;">Сума:</td>
-              <td style="padding: 12px 0; font-family: monospace; font-size: 18px; color: #e74c3c; font-weight: bold;">${totalPrice} ${bankDetails.currency}</td>
-            </tr>
-          </table>
-        </div>
-        
-        <div style="background-color: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-          <h4 style="color: #0c5460; margin-top: 0;">ℹ️ Важлива інформація:</h4>
-          <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.6;">
-            <li>Після оплати розробка сайту розпочнеться автоматично</li>
-            <li>Термін виконання: ${emailSettings.deliveryDays}</li>
-            <li>Ви отримаете сповіщення про зміну статусу замовлення</li>
-            <li>При виникненні питань звертайтесь за цим email або телефоном</li>
-          </ul>
-        </div>
-        
-        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-          <p style="color: #7f8c8d; margin: 5px 0;">З повагою,</p>
-          <p style="color: #2c3e50; font-weight: bold; margin: 5px 0;">Команда ${companyInfo.name}</p>
-          <p style="color: #7f8c8d; font-size: 14px; margin: 5px 0;">📧 ${companyInfo.email}</p>
-          <p style="color: #7f8c8d; font-size: 14px; margin: 5px 0;">📞 ${companyInfo.phone}</p>
-        </div>
-      </div>
-    </div>
-  `;
+
+  // Створюємо вітальну секцію
+  const greetingSection = createEmailSection(`
+    <h2 class="email-subtitle" style="color: #27ae60; margin-top: 0; font-size: 18px;">Вітаємо, ${user.firstName} ${user.lastName}!</h2>
+    <p class="email-text" style="margin: 10px 0; line-height: 1.6; font-size: 14px;">
+      Дякуємо за заповнення всіх даних для вашого сайту. Тепер можете оплатити замовлення за реквізитами нижче.
+    </p>
+  `, '#e8f5e8');
+
+  // Створюємо секцію з деталями замовлення
+  const orderDetailsTable = createEmailTable([
+    ['Тип сайту:', templateNames[order.tariffType] || order.tariffType],
+    [`<strong style="font-size: 16px;">Загальна сума:</strong>`, `<span class="total-price" style="font-weight: bold; font-size: 18px; color: #e74c3c;">${totalPrice} ${bankDetails.currency}</span>`]
+  ]);
+
+  const orderDetailsSection = createEmailSection(`
+    <h3 class="email-subtitle" style="color: #2c3e50; margin-top: 0; font-size: 16px;">📋 Деталі замовлення:</h3>
+    ${orderDetailsTable}
+    ${additionalFeaturesHtml}
+  `, '#f8f9fa');
+
+  // Створюємо секцію з реквізитами для оплати
+  const paymentDetailsTable = createEmailTable([
+    ['Одержувач:', `<span class="monospace-text" style="font-family: monospace; font-size: 13px; word-break: break-word;">${bankDetails.recipient}</span>`],
+    ['IBAN:', `<span class="monospace-text" style="font-family: monospace; background-color: #fff; padding: 8px; border-radius: 4px; font-size: 13px; word-break: break-all; letter-spacing: 1px; display: inline-block;">${bankDetails.iban}</span>`],
+    ['Банк:', `<span class="monospace-text" style="font-family: monospace; font-size: 13px; word-break: break-word;">${bankDetails.bank}</span>`],
+    ['Призначення платежу:', `<span class="monospace-text" style="font-family: monospace; font-size: 13px; word-break: break-word; line-height: 1.4;">Оплата за розробку сайту. Замовлення #${order._id.toString().slice(-6)}</span>`],
+    ['Сума:', `<span class="total-price monospace-text" style="font-family: monospace; font-size: 16px; color: #e74c3c; font-weight: bold;">${totalPrice} ${bankDetails.currency}</span>`]
+  ]);
+
+  const paymentDetailsSection = createEmailSection(`
+    <h3 class="email-subtitle" style="color: #856404; margin-top: 0; font-size: 16px;">💰 Реквізити для оплати:</h3>
+    ${paymentDetailsTable}
+  `, '#fff3cd', '#ffeaa7');
+
+  // Створюємо інформаційний блок
+  const infoSection = createInfoBlock('ℹ️ Важлива інформація:', `
+    <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.6;">
+      <li style="margin-bottom: 5px;">Після оплати розробка сайту розпочнеться автоматично</li>
+      <li style="margin-bottom: 5px;">Термін виконання: ${emailSettings.deliveryDays}</li>
+      <li style="margin-bottom: 5px;">Ви отримаете сповіщення про зміну статусу замовлення</li>
+      <li style="margin-bottom: 5px;">При виникненні питань звертайтесь за цим email або телефоном</li>
+    </ul>
+  `, 'info');
+
+  // Збираємо всі секції разом
+  const emailContent = greetingSection + orderDetailsSection + paymentDetailsSection + infoSection;
+
+  // Створюємо фінальний email template
+  return createResponsiveEmailTemplate(
+    '💳 Реквізити для оплати',
+    emailContent,
+    {
+      footerText: 'З повагою,',
+      footerEmail: companyInfo.email,
+      footerWebsite: companyInfo.website.replace('https://', ''),
+      companyName: companyInfo.name
+    }
+  );
 };
 
 const createOrder = async (req, res) => {
@@ -155,12 +144,34 @@ const createOrder = async (req, res) => {
 
     try {
       // Send email to customer
-      await sendEmail(email, 'Ваші дані для входу', `
-        <h2>Дякуємо за замовлення!</h2>
-        <p><strong>Ваш логін:</strong> ${email}</p>
-        <p><strong>Ваш пароль:</strong> ${rawPassword}</p>
-        <p>Увійдіть у свій кабінет, щоб завершити оформлення сайту.</p>
-      `);
+      const customerEmailContent = createEmailSection(`
+        <h2 class="email-subtitle" style="color: #26B26A; margin-top: 0; font-size: 18px;">Дякуємо за замовлення!</h2>
+        <p class="email-text" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+          Ваше замовлення успішно створено. Використовуйте дані нижче для входу в особистий кабінет.
+        </p>
+      `, '#e8f5e8') + createInfoBlock('🔑 Дані для входу:', `
+        <table style="width: 100%; margin: 10px 0;">
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Логін (Email):</td>
+            <td style="padding: 8px 0; font-size: 14px; word-break: break-word;">${email}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Пароль:</td>
+            <td style="padding: 8px 0; font-family: monospace; font-size: 16px; font-weight: bold; color: #e74c3c;">${rawPassword}</td>
+          </tr>
+        </table>
+      `, 'warning') + createEmailSection(`
+        <p class="email-text" style="margin: 0; font-size: 14px; text-align: center;">
+          <strong>Увійдіть у свій кабінет, щоб завершити оформлення сайту.</strong>
+        </p>
+      `, '#f8f9fa');
+
+      const customerEmailTemplate = createResponsiveEmailTemplate(
+        '🎉 Ваше замовлення створено',
+        customerEmailContent
+      );
+
+      await sendEmail(email, 'Ваші дані для входу', customerEmailTemplate);
       console.log('Customer email sent successfully for:', email);
     } catch (emailError) {
       console.error('Customer email sending failed:', emailError);
@@ -168,16 +179,46 @@ const createOrder = async (req, res) => {
 
     try {
       // Send notification to admin
-      await sendEmail(process.env.SMTP_EMAIL, 'Нове замовлення на сайті', `
-        <h2>Нове замовлення!</h2>
-        <p><strong>Клієнт:</strong> ${firstName} ${lastName}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Телефон:</strong> ${phone}</p>
-        <p><strong>ID замовлення:</strong> ${newOrder._id}</p>
-        <p><strong>Час створення:</strong> ${new Date().toLocaleString('uk-UA')}</p>
-        <hr>
-        <p>Увійдіть в адмін панель для перегляду деталей замовлення.</p>
-      `);
+      const adminEmailContent = createEmailSection(`
+        <h2 class="email-subtitle" style="color: #e74c3c; margin-top: 0; font-size: 18px;">🆕 Нове замовлення!</h2>
+        <p class="email-text" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+          На сайті створено нове замовлення. Перевірте деталі нижче.
+        </p>
+      `, '#fdeaea') + createEmailSection(`
+        <h3 class="email-subtitle" style="color: #2c3e50; margin-top: 0; font-size: 16px;">👤 Інформація про клієнта:</h3>
+        <table style="width: 100%; margin: 10px 0;">
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Клієнт:</td>
+            <td style="padding: 8px 0; font-size: 14px;">${firstName} ${lastName}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Email:</td>
+            <td style="padding: 8px 0; font-size: 14px; word-break: break-word;">${email}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Телефон:</td>
+            <td style="padding: 8px 0; font-size: 14px;">${phone}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">ID замовлення:</td>
+            <td style="padding: 8px 0; font-family: monospace; font-size: 14px;">${newOrder._id}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Час створення:</td>
+            <td style="padding: 8px 0; font-size: 14px;">${new Date().toLocaleString('uk-UA')}</td>
+          </tr>
+        </table>
+      `, '#f8f9fa') + createInfoBlock('⚡ Дія потрібна:', `
+        Увійдіть в адмін панель для перегляду деталей замовлення та встановлення ціни.
+      `, 'warning');
+
+      const adminEmailTemplate = createResponsiveEmailTemplate(
+        '🆕 Нове замовлення на сайті',
+        adminEmailContent,
+        { footerText: 'Адмін-панель Growth Tech' }
+      );
+
+      await sendEmail(process.env.SMTP_EMAIL, 'Нове замовлення на сайті', adminEmailTemplate);
       console.log('Admin notification sent successfully');
     } catch (emailError) {
       console.error('Admin notification sending failed:', emailError);
@@ -224,18 +265,54 @@ const updateTemplate = async (req, res) => {
 
     // Send notification to admin about template update
     try {
-      await sendEmail(process.env.SMTP_EMAIL, 'Замовлення готове до розгляду', `
-        <h2>Клієнт заповнив всі дані!</h2>
-        <p><strong>Клієнт:</strong> ${user.firstName} ${user.lastName}</p>
-        <p><strong>Email:</strong> ${user.email}</p>
-        <p><strong>Телефон:</strong> ${user.phone}</p>
-        <p><strong>ID замовлення:</strong> ${order._id}</p>
-        <p><strong>Обраний шаблон:</strong> ${template}</p>
-        <p><strong>Статус:</strong> Чернетка</p>
-        <p><strong>Час оновлення:</strong> ${new Date().toLocaleString('uk-UA')}</p>
-        <hr>
-        <p>Замовлення готове до розгляду. Увійдіть в адмін панель, ознайомтесь з матеріалами та встановіть ціну. Після встановлення ціни клієнт отримає реквізити для оплати.</p>
-      `);
+      const templateUpdateEmailContent = createEmailSection(`
+        <h2 class="email-subtitle" style="color: #27ae60; margin-top: 0; font-size: 18px;">✅ Клієнт заповнив всі дані!</h2>
+        <p class="email-text" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+          Замовлення готове до розгляду адміністратора.
+        </p>
+      `, '#e8f5e8') + createEmailSection(`
+        <h3 class="email-subtitle" style="color: #2c3e50; margin-top: 0; font-size: 16px;">👤 Інформація про клієнта:</h3>
+        <table style="width: 100%; margin: 10px 0;">
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Клієнт:</td>
+            <td style="padding: 8px 0; font-size: 14px;">${user.firstName} ${user.lastName}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Email:</td>
+            <td style="padding: 8px 0; font-size: 14px; word-break: break-word;">${user.email}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Телефон:</td>
+            <td style="padding: 8px 0; font-size: 14px;">${user.phone}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">ID замовлення:</td>
+            <td style="padding: 8px 0; font-family: monospace; font-size: 14px;">${order._id}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Обраний шаблон:</td>
+            <td style="padding: 8px 0; font-size: 14px;">${template}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Статус:</td>
+            <td style="padding: 8px 0; font-size: 14px;">Чернетка</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Час оновлення:</td>
+            <td style="padding: 8px 0; font-size: 14px;">${new Date().toLocaleString('uk-UA')}</td>
+          </tr>
+        </table>
+      `, '#f8f9fa') + createInfoBlock('⚡ Дія потрібна:', `
+        Замовлення готове до розгляду. Увійдіть в адмін панель, ознайомтесь з матеріалами та встановіть ціну. Після встановлення ціни клієнт отримає реквізити для оплати.
+      `, 'warning');
+
+      const templateUpdateEmailTemplate = createResponsiveEmailTemplate(
+        '✅ Замовлення готове до розгляду',
+        templateUpdateEmailContent,
+        { footerText: 'Адмін-панель Growth Tech' }
+      );
+
+      await sendEmail(process.env.SMTP_EMAIL, 'Замовлення готове до розгляду', templateUpdateEmailTemplate);
       console.log('Admin notification sent about order ready for review');
     } catch (emailError) {
       console.error('Admin notification sending failed:', emailError);
@@ -336,10 +413,31 @@ const confirmOrder = async (req, res) => {
     order.pdfUrl = pdfUrl;
     await order.save();
 
-    await sendEmail(order.user.email, 'Підтвердження замовлення', `
-      <p>Ваш договір сформовано. Завантажити можна за посиланням:</p>
-      <a href="http://growth-tech.com.ua/${pdfUrl}" target="_blank">Завантажити PDF</a>
-    `);
+    const confirmationEmailContent = createEmailSection(`
+      <h2 class="email-subtitle" style="color: #27ae60; margin-top: 0; font-size: 18px;">🎉 Замовлення підтверджено!</h2>
+      <p class="email-text" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+        Ваше замовлення успішно підтверджено. Договір сформовано та готовий до завантаження.
+      </p>
+    `, '#e8f5e8') + createInfoBlock('📄 Документи:', `
+      <p style="margin: 10px 0; text-align: center;">
+        Ваш договір готовий для завантаження:
+      </p>
+    `, 'info') + createEmailButton(
+      '📥 Завантажити договір (PDF)',
+      `http://growth-tech.com.ua/${pdfUrl}`,
+      '#e74c3c'
+    ) + createEmailSection(`
+      <p class="email-text" style="margin: 0; font-size: 14px; text-align: center;">
+        Зберігайте цей документ для своїх записів.
+      </p>
+    `, '#f8f9fa');
+
+    const confirmationEmailTemplate = createResponsiveEmailTemplate(
+      '📋 Підтвердження замовлення',
+      confirmationEmailContent
+    );
+
+    await sendEmail(order.user.email, 'Підтвердження замовлення', confirmationEmailTemplate);
 
     res.status(200).json({ message: 'Замовлення підтверджено' });
   } catch (error) {
@@ -408,14 +506,28 @@ const updateOrderStatus = async (req, res) => {
     };
 
     try {
-      let emailContent = `
-        <h2>Статус вашого замовлення змінено</h2>
-        <p><strong>ID замовлення:</strong> ${order._id}</p>
-        <p><strong>Новий статус:</strong> ${statusTranslations[status] || status}</p>
-        <p>${statusMessages[status]}</p>
-        <hr>
-        <p>Увійдіть у свій кабінет для перегляду деталей.</p>
-      `;
+      const statusUpdateEmailContent = createEmailSection(`
+        <h2 class="email-subtitle" style="color: #2c3e50; margin-top: 0; font-size: 18px;">📊 Статус замовлення змінено</h2>
+        <p class="email-text" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+          ${statusMessages[status]}
+        </p>
+      `, '#f8f9fa') + createEmailSection(`
+        <h3 class="email-subtitle" style="color: #2c3e50; margin-top: 0; font-size: 16px;">📋 Деталі оновлення:</h3>
+        <table style="width: 100%; margin: 10px 0;">
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">ID замовлення:</td>
+            <td style="padding: 8px 0; font-family: monospace; font-size: 14px;">${order._id}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; font-size: 14px;">Новий статус:</td>
+            <td style="padding: 8px 0; font-size: 14px; font-weight: bold; color: #27ae60;">${statusTranslations[status] || status}</td>
+          </tr>
+        </table>
+      `, '#e8f5e8') + createInfoBlock('💡 Що далі?', `
+        Увійдіть у свій кабінет для перегляду деталей замовлення.
+      `, 'info');
+
+      let emailContent = statusUpdateEmailContent;
 
       // Якщо статус "pending_payment" і реквізити ще не відправлені
       if (status === 'pending_payment' && !order.paymentEmailSent && order.amount) {
@@ -445,23 +557,29 @@ const updateOrderStatus = async (req, res) => {
       // Якщо статус "completed", додаємо посилання на відгук
       if (status === 'completed') {
         const reviewUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/review/${order._id}`;
-        emailContent += `
-          <div style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; margin-top: 20px;">
-            <h3 style="color: #27ae60; margin-top: 0;">🌟 Залиште відгук про нашу роботу!</h3>
-            <p>Ваше замовлення завершено! Ми будемо дуже вдячні, якщо ви залишите відгук про якість нашої роботи.</p>
-            <p style="text-align: center; margin-top: 20px;">
-              <a href="${reviewUrl}" style="background-color: #27ae60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                Залишити відгук
-              </a>
-            </p>
-            <p style="font-size: 12px; color: #666; margin-top: 15px;">
-              Ваш відгук допоможе іншим клієнтам довіритися нам та покращить якість наших послуг.
-            </p>
-          </div>
-        `;
+        const reviewSection = createInfoBlock('🌟 Залиште відгук про нашу роботу!', `
+          <p style="margin: 10px 0; text-align: center;">
+            Ваше замовлення завершено! Ми будемо дуже вдячні, якщо ви залишите відгук про якість нашої роботи.
+          </p>
+        `, 'success') + createEmailButton(
+          '⭐ Залишити відгук',
+          reviewUrl,
+          '#27ae60'
+        ) + createEmailSection(`
+          <p style="font-size: 12px; color: #666; margin: 0; text-align: center;">
+            Ваш відгук допоможе іншим клієнтам довіритися нам та покращить якість наших послуг.
+          </p>
+        `, '#f8f9fa');
+        
+        emailContent += reviewSection;
       }
 
-      await sendEmail(order.user.email, 'Оновлення статусу замовлення', emailContent);
+      const finalEmailTemplate = createResponsiveEmailTemplate(
+        '📊 Оновлення статусу замовлення',
+        emailContent
+      );
+
+      await sendEmail(order.user.email, 'Оновлення статусу замовлення', finalEmailTemplate);
       console.log('Status update notification sent to client');
     } catch (emailError) {
       console.error('Status update notification failed:', emailError);

@@ -692,56 +692,7 @@
     max-width: 120px; /* Actions */
   }
   
-  /* Card-style layout for mobile orders */
-  .mobile-orders-container {
-    display: none;
-    width: 100%;
-    max-width: 100%;
-  }
-  
-  .mobile-order-card {
-    display: none;
-    background: var(--color-background);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .mobile-order-card h4 {
-    margin: 0 0 10px 0;
-    color: var(--color-text);
-    font-size: 16px;
-  }
-  
-  .mobile-order-detail {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 14px;
-  }
-  
-  .mobile-order-detail strong {
-    color: var(--color-text);
-  }
-  
-  .mobile-order-actions {
-    margin-top: 15px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  
-  .mobile-order-actions .action-btn {
-    flex: 1;
-    min-width: 100px;
-    padding: 8px 12px;
-    font-size: 12px;
-  }
+  /* Mobile order cards removed */
   
   .modal-content.large {
     margin: 2% auto;
@@ -930,12 +881,7 @@
       white-space: nowrap;
     }
     
-    .mobile-order-card {
-      display: none;
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
+    /* Mobile order cards removed */
     
     .admin__stats {
       grid-template-columns: 1fr;

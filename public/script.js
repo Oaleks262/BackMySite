@@ -461,30 +461,17 @@ async function loadReviews() {
 // Display reviews in homepage
 function displayReviews(reviews, container) {
   if (reviews.length === 0) {
-    container.innerHTML = '<div class="reviews__empty"><p>Поки що відгуків немає, але ви можете стати першим!</p></div>';
+    container.innerHTML = '<li class="testimonial__item swiper-slide"><h3>Поки що відгуків немає</h3><p>"Станьте першим, хто залишить відгук!"</p><strong>Команда Growth-tech</strong></li>';
     return;
   }
 
   const reviewsHTML = reviews.map(review => {
-    const stars = '⭐'.repeat(review.rating);
-    const date = new Date(review.createdAt).toLocaleDateString('uk-UA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-    
     return `
-      <div class="review-card">
-        <div class="review-header">
-          <div class="review-client">${review.clientName}</div>
-          <div class="review-rating">
-            ${stars}
-          </div>
-        </div>
-        <div class="review-project">${review.projectType}</div>
-        <div class="review-comment">${review.comment}</div>
-        <div class="review-date">${date}</div>
-      </div>
+      <li class="testimonial__item swiper-slide">
+        <h3>${review.clientName}</h3>
+        <p>"${review.comment}"</p>
+        <strong>${review.projectType}</strong>
+      </li>
     `;
   }).join('');
 
