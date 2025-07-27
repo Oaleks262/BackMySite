@@ -1309,22 +1309,49 @@ async function deleteOrder(orderId) {
 }
 
 
-// Simple admin login
+// Proper admin login with server authentication
 async function adminLogin() {
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
+  
+  if (!email || !password) {
+    showAlert('Введіть email та пароль', 'error');
+    return;
+  }
+  
   try {
-    // Створюємо тимчасовий токен з адмін правами
-    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDdmMWY3N2JjZjg2Y2Q3OTk0MzkwMTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTI5NDc4OTQsImV4cCI6MTc1MzU1MjY5NH0.qaR8uNFb3eTBIqN1qghgkN1Tetdo3Myp64bzJYtmivc';
-    const adminUser = { role: 'admin', email: 'admin@test.com' };
+    const response = await fetch(getAPIUrl('/api/auth/login'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
     
-    localStorage.setItem('token', adminToken);
-    localStorage.setItem('user', JSON.stringify(adminUser));
-    
-    document.getElementById('adminLoginSection').style.display = 'none';
-    await loadOrders(); // Завантажуємо замовлення після логіну
-    
-    showAlert('Успішно увійшли як адмін', 'success');
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Перевіряємо чи користувач має права адміна
+      if (data.user.role !== 'admin') {
+        showAlert('Доступ заборонено. Тільки для адміністраторів.', 'error');
+        return;
+      }
+      
+      // Зберігаємо токен отриманий з сервера
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      document.getElementById('adminLoginSection').style.display = 'none';
+      await loadOrders();
+      
+      showAlert(`Вітаємо, ${data.user.firstName}!`, 'success');
+    } else {
+      const errorData = await response.json();
+      showAlert(errorData.error || 'Помилка входу', 'error');
+    }
   } catch (error) {
-    showAlert('Помилка входу', 'error');
+    console.error('Login error:', error);
+    showAlert('Помилка підключення до сервера', 'error');
   }
 }
 
@@ -1338,6 +1365,16 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Admin login button handler
   document.getElementById('adminLoginBtn').addEventListener('click', adminLogin);
+  
+  // Handle Enter key in login form
+  const passwordField = document.getElementById('adminPassword');
+  if (passwordField) {
+    passwordField.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        adminLogin();
+      }
+    });
+  }
   
   // Delete order button handler
   document.addEventListener('click', function(e) {

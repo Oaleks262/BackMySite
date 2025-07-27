@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const authRoutes = require('./routes/auth');
 const orderRoutes = require('./routes/orders');
@@ -39,11 +41,50 @@ if (missingEnvVars.length > 0) {
 }
 
 console.log('✅ All required environment variables are present');
-console.log('Port:', process.env.PORT || 5000);
+console.log('Port:', process.env.PORT || 4444);
 console.log('MongoDB URI:', process.env.MONGO_URI ? 'Set' : 'Not set');
 console.log('JWT Secret:', process.env.JWT_SECRET ? 'Set' : 'Not set');
 
 const app = express();
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"]
+    }
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 login attempts per windowMs
+  message: 'Too many login attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
+app.use('/api/auth/login', authLimiter);
 
 app.use(cors());
 // Raw body parser for Stripe webhooks
@@ -125,7 +166,7 @@ console.log('🔄 Connecting to MongoDB...');
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected successfully');
-    const port = process.env.PORT || 5000;
+    const port = process.env.PORT || 4444;
     app.listen(port, () => {
       console.log(`🚀 Server running on port ${port}`);
       console.log(`📍 API available at: http://localhost:${port}/api/`);

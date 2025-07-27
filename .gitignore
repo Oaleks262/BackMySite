@@ -127,3 +127,7 @@ ecosystem.config.js
 
 # Uploads
 uploads/
+
+# Security - Scripts with hardcoded credentials
+utils/createAdmin.js
+utils/resetAdminPassword.js

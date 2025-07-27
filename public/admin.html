@@ -105,7 +105,18 @@
         <h1>Адмін панель</h1>
         <p>Керування замовленнями та користувачами</p>
         <div id="adminLoginSection" style="margin-top: 20px; display: none;">
-          <button id="adminLoginBtn" class="action-btn confirm">Увійти як адмін</button>
+          <div class="login-form">
+            <h3>Вхід для адміністратора</h3>
+            <div class="form-group">
+              <label for="adminEmail">Email:</label>
+              <input type="email" id="adminEmail" placeholder="admin@growth-tech.com.ua" required>
+            </div>
+            <div class="form-group">
+              <label for="adminPassword">Пароль:</label>
+              <input type="password" id="adminPassword" placeholder="Введіть пароль" required>
+            </div>
+            <button id="adminLoginBtn" class="action-btn confirm">Увійти як адмін</button>
+          </div>
         </div>
       </div>
 
