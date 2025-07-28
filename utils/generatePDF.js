@@ -33,21 +33,34 @@ const addDays = (date, days) => {
 };
 
 const generatePDF = async (order) => {
-  const doc = new PDFDocument();
-  const pdfDir = path.join(__dirname, '../public/pdfs');
-  const contractVersion = order.contractVersion || 1;
-  const filePath = path.join(pdfDir, `contract_${order._id}_v${contractVersion}.pdf`);
-  
-  // Створити директорію якщо не існує
-  if (!fs.existsSync(pdfDir)) {
-    fs.mkdirSync(pdfDir, { recursive: true });
-  }
+  try {
+    console.log('Starting PDF generation for order:', order._id);
+    
+    const doc = new PDFDocument();
+    const pdfDir = path.join(__dirname, '../public/pdfs');
+    const contractVersion = order.contractVersion || 1;
+    const filePath = path.join(pdfDir, `contract_${order._id}_v${contractVersion}.pdf`);
+    
+    console.log('PDF directory:', pdfDir);
+    console.log('PDF file path:', filePath);
+    
+    // Створити директорію якщо не існує
+    if (!fs.existsSync(pdfDir)) {
+      console.log('Creating PDF directory...');
+      fs.mkdirSync(pdfDir, { recursive: true });
+    }
   
   const writeStream = fs.createWriteStream(filePath);
 
   // ✅ підключення шрифту з кирилицею
-  doc.registerFont('DejaVu', path.join(__dirname, 'fonts/DejaVuSans.ttf'));
-  doc.font('DejaVu');
+  const fontPath = path.join(__dirname, 'fonts/DejaVuSans.ttf');
+  if (fs.existsSync(fontPath)) {
+    doc.registerFont('DejaVu', fontPath);
+    doc.font('DejaVu');
+  } else {
+    console.warn('Font DejaVuSans.ttf not found, using default font');
+    // Використовуємо стандартний шрифт
+  }
 
   doc.pipe(writeStream);
 
@@ -229,10 +242,20 @@ ${order.user.firstName} ${order.user.lastName}, фізична особа, на�
 
   doc.end();
 
-  return new Promise((resolve, reject) => {
-    writeStream.on('finish', () => resolve(filePath));
-    writeStream.on('error', reject);
-  });
+    return new Promise((resolve, reject) => {
+      writeStream.on('finish', () => {
+        console.log('PDF generated successfully:', filePath);
+        resolve(filePath);
+      });
+      writeStream.on('error', (error) => {
+        console.error('PDF generation error:', error);
+        reject(error);
+      });
+    });
+  } catch (error) {
+    console.error('PDF generation failed:', error);
+    throw error;
+  }
 };
 
 module.exports = { generatePDF };
