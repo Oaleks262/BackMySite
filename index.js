@@ -47,24 +47,24 @@ console.log('JWT Secret:', process.env.JWT_SECRET ? 'Set' : 'Not set');
 
 const app = express();
 
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"]
-    }
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}));
+// Security middleware - temporarily disabled due to CSP issues
+// app.use(helmet({
+//   contentSecurityPolicy: {
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+//       fontSrc: ["'self'", "https://fonts.gstatic.com"],
+//       scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+//       imgSrc: ["'self'", "data:", "https:"],
+//       connectSrc: ["'self'"]
+//     }
+//   },
+//   hsts: {
+//     maxAge: 31536000,
+//     includeSubDomains: true,
+//     preload: true
+//   }
+// }));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -83,8 +83,9 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use(limiter);
-app.use('/api/auth/login', authLimiter);
+// Temporarily disable rate limiting
+// app.use(limiter);
+// app.use('/api/auth/login', authLimiter);
 
 app.use(cors());
 // Raw body parser for Stripe webhooks
