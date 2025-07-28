@@ -397,16 +397,26 @@ const confirmOrder = async (req, res) => {
   const { orderId } = req.params;
   
   console.log('confirmOrder викликано для orderId:', orderId);
+  console.log('Environment check:', {
+    nodeEnv: process.env.NODE_ENV,
+    hasSmtpEmail: !!process.env.SMTP_EMAIL,
+    hasSmtpPass: !!process.env.SMTP_PASS
+  });
 
   try {
+    console.log('Fetching order from database...');
     const order = await Order.findById(orderId).populate('user');
     if (!order) return res.status(404).json({ error: 'Замовлення не знайдено' });
+    
+    console.log('Order found:', { id: order._id, amount: order.amount, hasUser: !!order.user });
 
     if (!order.amount || order.amount <= 0) {
       return res.status(400).json({ error: 'Спочатку потрібно встановити ціну замовлення' });
     }
 
+    console.log('Starting PDF generation...');
     const pdfPath = await generatePDF(order);
+    console.log('PDF generated successfully:', pdfPath);
     const pdfUrl = `/pdfs/${path.basename(pdfPath)}`;
 
     order.confirmed = true;
