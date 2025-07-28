@@ -73,7 +73,7 @@ const generatePDF = async (order) => {
   
   doc.fontSize(18).text('ЦИВІЛЬНО-ПРАВОВИЙ ДОГОВІР', { align: 'center' });
   doc.fontSize(16).text('про надання послуг з розробки веб-сайту', { align: 'center' });
-  doc.fontSize(14).text('№ ' + order._id.slice(-6), { align: 'center' });
+  doc.fontSize(14).text('№ ' + order._id.toString().slice(-6), { align: 'center' });
   doc.moveDown();
 
   doc.fontSize(12).text(`м. Львів                                                            "${formatDate(contractDate)}"`, { align: 'left' });
