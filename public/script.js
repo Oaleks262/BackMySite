@@ -249,6 +249,8 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     message: formData.get('message')
   };
   
+  console.log('Submitting contact form:', data);
+  
   try {
     const response = await fetch(getAPIUrl('/api/contact'), {
       method: 'POST',
@@ -258,7 +260,9 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
       body: JSON.stringify(data)
     });
     
+    console.log('Response status:', response.status);
     const result = await response.json();
+    console.log('Response data:', result);
     
     if (response.ok) {
       showAlert('Повідомлення надіслано успішно! Ми зв\'яжемося з вами найближчим часом.', 'success', 'Успіх');
@@ -268,6 +272,7 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
       showAlert('Помилка: ' + result.error, 'error', 'Помилка');
     }
   } catch (error) {
+    console.error('Contact form error:', error);
     showAlert('Помилка при відправці повідомлення. Спробуйте пізніше.', 'error', 'Помилка');
   }
 });
